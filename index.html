@@ -275,12 +275,15 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
 .legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
 
 /* ===== regras ===== */
-.regras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-@media (max-width: 900px) { .regras { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 520px) { .regras { grid-template-columns: 1fr; } }
-.regra { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.regra .fx { font-size: 14.5px; font-weight: 600; color: var(--navy); }
-.regra .tag { font-size: 11px; padding: 7px 14px; }
+.regra-grupo + .regra-grupo { margin-top: 26px; }
+.regra-tit { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 14px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: .5px; }
+.regra-tit::before { content: ""; width: 4px; height: 18px; background: var(--red); border-radius: 2px; }
+.regras-lista { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 760px) { .regras-lista { grid-template-columns: 1fr; } }
+.regra { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 15px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.regra .fx { font-size: 14.5px; font-weight: 600; color: var(--navy); line-height: 1.35; }
+.regra .tag { font-size: 11px; padding: 7px 14px; flex: none; }
+.tag.neg { background: #fff; color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
 .nota { font-size: 13px; color: var(--text-2); font-weight: 400; margin: 18px 0 0; }
 .nota b { color: var(--navy); }
 
@@ -478,7 +481,7 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
         <p class="eyebrow">Como pontuar</p>
         <h2 class="sec-title">Regras de pontuação</h2>
         <div class="accent"></div>
-        <p class="sec-desc">Cada imóvel captado soma os pontos da faixa em que o seu valor se encaixa.</p>
+        <p class="sec-desc">Pontos de cada tipo de captação, conforme a aba "Pontuação" da planilha. Cancelamentos descontam pontos.</p>
       </div>
       <div class="regras" id="tbRegras"></div>
       <p class="nota" id="notaDesempate"></p>
@@ -573,23 +576,27 @@ function lerFaixas(ws) {
   if (h < 0) return FAIXAS_PADRAO;
   const cab = L[h].map(norm);
   const col = re => cab.findIndex(c => re.test(c));
-  const cMin = col(/minim|a partir|^de$/), cMax = col(/maxim|^ate/), cPts = col(/ponto/), cLbl = col(/faixa|descri/);
-  if (cMin < 0 || cPts < 0) return FAIXAS_PADRAO;
+  const cMin = col(/minim|a partir|^de$/), cMax = col(/maxim|^ate/), cPts = col(/ponto/), cLbl = col(/faixa|descri|regra|criterio|tipo/);
+  if (cPts < 0) return FAIXAS_PADRAO;
+  // Lê as regras na ordem da planilha: Pontos + Faixa (descrição). Valor mínimo/máximo são opcionais.
   const out = [];
   for (const r of L.slice(h + 1)) {
-    if (!r) break;
-    const min = toNum(r[cMin]), pts = toNum(r[cPts]);
-    if (!isFinite(min) || !isFinite(pts)) break;
-    const max = cMax >= 0 ? toNum(r[cMax]) : NaN;
-    out.push({ min, max: isFinite(max) ? max : null, pontos: pts, faixa: cLbl >= 0 && r[cLbl] ? String(r[cLbl]) : null });
+    const pts = r ? toNum(r[cPts]) : NaN;
+    if (!isFinite(pts)) { if (out.length) break; continue; }
+    const min = cMin >= 0 ? toNum(r[cMin]) : NaN, max = cMax >= 0 ? toNum(r[cMax]) : NaN;
+    const lbl = cLbl >= 0 && r[cLbl] != null ? String(r[cLbl]).trim() : '';
+    out.push({ min: isFinite(min) ? min : null, max: isFinite(max) ? max : null, pontos: pts, faixa: lbl || null });
   }
-  out.sort((a, b) => a.min - b.min);
-  out.forEach(f => { if (!f.faixa) f.faixa = f.max != null ? `${fmtBRLc(f.min)} a ${fmtBRLc(f.max)}` : `Acima de ${fmtBRLc(f.min)}`; });
+  out.forEach(f => {
+    if (f.faixa) return;
+    f.faixa = f.min == null ? `${fmtPts(f.pontos)} pontos` : f.max != null ? `${fmtBRLc(f.min)} a ${fmtBRLc(f.max)}` : `Acima de ${fmtBRLc(f.min)}`;
+  });
   return out.length ? out : FAIXAS_PADRAO;
 }
+// Só usado quando a coluna Pontuação da captação está vazia e as regras têm faixas de valor
 function pontosPorValor(valor, faixas) {
   let p = 0;
-  for (const f of faixas) if (valor >= f.min) p = f.pontos;
+  for (const f of faixas.filter(f => f.min != null).sort((a, b) => a.min - b.min)) if (valor >= f.min) p = f.pontos;
   return p;
 }
 
@@ -832,7 +839,18 @@ function renderFeed(E) {
 }
 
 function renderRegras(E) {
-  $('tbRegras').innerHTML = E.faixas.map(f => `<div class="regra"><span class="fx">${esc(f.faixa)}</span><span class="tag pill red">${fmtPts(f.pontos)} pontos</span></div>`).join('');
+  // Agrupa pelo prefixo do texto ("VENDA - ...", "LOCAÇÃO - ..."); sem prefixo, lista simples
+  const grupos = new Map();
+  for (const f of E.faixas) {
+    const m = String(f.faixa).match(/^([^\-–]{2,30}?)\s+[-–]\s+(.+)$/);
+    const g = m ? m[1].trim() : '';
+    if (!grupos.has(g)) grupos.set(g, []);
+    grupos.get(g).push({ txt: m ? m[2].trim() : f.faixa, pontos: f.pontos });
+  }
+  const sinal = p => (p > 0 ? '+' : p < 0 ? '−' : '') + fmtPts(Math.abs(p));
+  const item = i => `<div class="regra"><span class="fx">${esc(i.txt)}</span><span class="tag pill ${i.pontos < 0 ? 'neg' : 'red'}">${sinal(i.pontos)} pontos</span></div>`;
+  $('tbRegras').innerHTML = [...grupos].map(([g, itens]) =>
+    `<div class="regra-grupo">${g ? `<h3 class="regra-tit">${esc(g)}</h3>` : ''}<div class="regras-lista">${itens.map(item).join('')}</div></div>`).join('');
   $('notaDesempate').innerHTML = '<b>Critério de desempate:</b> ' + esc(E.camp.desempate || 'maior valor total captado; persistindo, maior número de imóveis.');
 }
 
