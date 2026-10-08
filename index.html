@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#000e35">
 <meta name="apple-mobile-web-app-title" content="Captação RE/MAX">
-<link rel="apple-touch-icon" href="logo.jpg">
+<link rel="apple-touch-icon" href="logo-remax.png">
 <title>RE/MAX · Ranking de Captação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,11 +56,13 @@ button { font: inherit; color: inherit; }
 
 /* ===== barra superior ===== */
 .nav { background: var(--navy-900); box-shadow: 0 2px 4px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 20; }
-.nav-in { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 84px; display: flex; align-items: center; gap: 18px; }
-/* logo da franquia (JPG com fundo branco) dentro de uma plaquinha branca */
-.marca { background: #fff; border-radius: 8px; padding: 2px 6px; display: inline-flex; align-items: center; flex: none; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
-.logo { height: 64px; width: auto; display: block; }
-.logo-txt { color: var(--navy); font-weight: 800; font-size: 26px; letter-spacing: -1px; padding: 8px 10px; }
+.nav-in { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 80px; display: flex; align-items: center; gap: 18px; }
+/* logo RE/MAX (branco) com "DOMINUS" centralizado logo abaixo; --h = altura do logo */
+.marca { --h: 40px; display: inline-flex; flex-direction: column; align-items: center; flex: none; line-height: 1; }
+.logo { height: var(--h); width: auto; display: block; }
+.logo-txt { color: #fff; font-weight: 800; font-size: calc(var(--h) * .65); letter-spacing: -1px; }
+/* o PNG tem ~24% de sobra transparente embaixo: margem negativa aproxima o texto; padding-left compensa o espaçamento após a última letra */
+.marca-sub { color: #fff; font-weight: 500; font-size: calc(var(--h) * .33); letter-spacing: .38em; padding-left: .38em; margin-top: calc(var(--h) * -.16); white-space: nowrap; }
 .nav-sep { width: 1px; height: 28px; background: rgba(255,255,255,.25); }
 .nav-title { color: #fff; font-weight: 500; font-size: 15px; white-space: nowrap; }
 .nav-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
@@ -89,8 +91,8 @@ button { font: inherit; color: inherit; }
 @media (max-width: 760px) {
   .nav-sep, .nav-title { display: none; }
   .status span:last-child { display: none; }
-  .nav-in { padding: 0 16px; gap: 12px; height: 72px; }
-  .logo { height: 52px; }
+  .nav-in { padding: 0 16px; gap: 12px; height: 68px; }
+  .marca { --h: 34px; }
   .btn-remax { padding: 9px 16px; }
 }
 
@@ -285,15 +287,14 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
 /* ===== rodapé ===== */
 .foot { background: var(--navy-900); color: rgba(255,255,255,.85); position: relative; overflow: hidden; }
 .foot-in { padding: 34px 24px; max-width: 1240px; margin: 0 auto; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
-.foot .logo { height: 72px; }
+.foot .marca { --h: 40px; }
 .foot-txt { font-size: 13px; font-weight: 400; line-height: 1.7; }
 .foot-txt b { color: #fff; font-weight: 600; }
 .foot-bar { background: var(--navy-950); text-align: center; font-size: 12px; color: rgba(255,255,255,.6); padding: 10px 16px; font-weight: 400; }
 
 /* ===== tela de aviso / carregamento ===== */
 .aviso-tela { min-height: 100vh; background: linear-gradient(120deg, #0c2749 0%, #000e35 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; position: relative; overflow: hidden; }
-.aviso-tela .marca { margin-bottom: 28px; }
-.aviso-tela .logo { height: 104px; }
+.aviso-tela .marca { --h: 52px; margin-bottom: 28px; }
 .aviso-card { background: #fff; border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,.3); padding: 30px 32px; max-width: 560px; width: 100%; position: relative; z-index: 1; }
 .aviso-card h1 { font-size: 22px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: -.5px; margin: 0; }
 .aviso-card p { color: var(--text-2); font-weight: 400; margin: 0; }
@@ -317,7 +318,7 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
 <!-- ===================== CARREGANDO / AVISO ===================== -->
 <section id="vazio" class="aviso-tela">
   <div class="slashes light" style="left:6%;bottom:10%"><i></i><i></i><i></i></div>
-  <span class="marca"><img class="logo" src="logo.jpg" alt="RE/MAX Imóveis Dominus I e II" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"></span>
+  <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
   <div class="aviso-card">
     <h1 id="avisoTitulo">Carregando a planilha…</h1>
     <div class="accent"></div>
@@ -337,7 +338,7 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
 <div id="painel" class="hidden">
   <header class="nav">
     <div class="nav-in">
-      <span class="marca"><img class="logo" src="logo.jpg" alt="RE/MAX Imóveis Dominus I e II" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"></span>
+      <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
       <span class="nav-sep"></span>
       <span class="nav-title">Ranking de Captação</span>
       <div class="nav-actions">
@@ -486,7 +487,7 @@ table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
 
   <footer class="foot">
     <div class="foot-in">
-      <span class="marca"><img class="logo" src="logo.jpg" alt="RE/MAX Imóveis Dominus I e II" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"></span>
+      <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
       <div class="foot-txt" id="rodape"></div>
     </div>
     <div class="foot-bar">Painel interno da campanha de captação · dados lidos diretamente da planilha da campanha</div>
