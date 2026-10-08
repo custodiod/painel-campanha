@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000e35">
+<meta name="apple-mobile-web-app-title" content="Captação RE/MAX">
+<link rel="apple-touch-icon" href="logo-remax.png">
+<title>RE/MAX · Ranking de Captação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<style>
+/* ===== Identidade RE/MAX (cores e medidas extraídas de remax.com.br) ===== */
+:root {
+  color-scheme: light;
+  --navy-900: #000e35;      /* barra superior e rodapé */
+  --navy-950: #000a25;
+  --navy: #0c2749;          /* títulos, etiquetas */
+  --red: #dc1c2e;           /* botões, traço de destaque */
+  --red-soft: rgba(220, 28, 46, .10);
+  --blue: #003da5;          /* azul institucional */
+  --blue-bright: #0043ff;   /* balões de indicadores */
+  --blue-grad: linear-gradient(90deg, #2266ff 0%, #0043a8 100%);
+  --text: #404041;
+  --text-2: #485c77;
+  --muted: #8a94a6;
+  --page: #f3f3f3;
+  --band: #ecedeb;
+  --card: #ffffff;
+  --line: #e4e5e2;
+  --field: #f2f2f2;
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, .08);
+  --shadow-tag: 0 2px 8px rgba(0, 0, 0, .15);
+  --radius-card: 12px;
+  /* cores dos corretores no gráfico (paleta categórica validada p/ daltonismo) */
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --s-muted: #b9b8b1;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--page);
+  color: var(--text);
+  font: 300 16px/1.5 "Noto Sans", system-ui, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+b, strong { font-weight: 700; }
+button { font: inherit; color: inherit; }
+.hidden { display: none !important; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } }
+
+/* ===== barra superior ===== */
+.nav { background: var(--navy-900); box-shadow: 0 2px 4px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 20; }
+.nav-in { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 72px; display: flex; align-items: center; gap: 18px; }
+.logo { height: 40px; width: auto; display: block; }
+.logo-txt { color: #fff; font-weight: 800; font-size: 26px; letter-spacing: -1px; }
+.nav-sep { width: 1px; height: 28px; background: rgba(255,255,255,.25); }
+.nav-title { color: #fff; font-weight: 500; font-size: 15px; white-space: nowrap; }
+.nav-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,.8); font-size: 13px; font-weight: 400; white-space: nowrap; }
+.status b { color: #fff; font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #8a94a6; flex: none; }
+.status[data-s="ok"] .dot { background: #2ecc71; box-shadow: 0 0 0 3px rgba(46,204,113,.25); }
+.status[data-s="err"] .dot { background: var(--red); box-shadow: 0 0 0 3px rgba(220,28,46,.3); }
+.btn-remax {
+  display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+  background: var(--red); color: #fff; border-radius: 50px; padding: 10px 22px;
+  font-size: 13.6px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  box-shadow: 0 6px 16px rgba(220,28,46,.28); transition: filter .15s, transform .15s;
+}
+.btn-remax:hover { filter: brightness(1.08); }
+.btn-remax:active { transform: translateY(1px); }
+.btn-remax:disabled { cursor: progress; opacity: .9; }
+.btn-remax.girando svg { animation: gira .8s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.btn-square {
+  width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.9); border-radius: 4px;
+}
+.btn-square:hover { background: rgba(255,255,255,.08); }
+.btn-remax:focus-visible, .btn-square:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 760px) {
+  .nav-sep, .nav-title { display: none; }
+  .status span:last-child { display: none; }
+  .nav-in { padding: 0 16px; gap: 12px; height: 64px; }
+  .logo { height: 32px; }
+  .btn-remax { padding: 9px 16px; }
+}
+
+/* ===== elementos de marca ===== */
+.slashes { position: absolute; display: flex; gap: 10px; pointer-events: none; }
+.slashes i { width: 8px; height: 45px; border-radius: 4px; transform: skewX(-20deg); background: rgba(12,39,73,.08); }
+.slashes i.r { background: var(--red); }
+.slashes.light i { background: rgba(255,255,255,.08); }
+.slashes.light i.r { background: var(--red); }
+
+.sec-head { margin-bottom: 22px; }
+.eyebrow { font-size: 15px; font-weight: 400; color: var(--text-2); margin: 0 0 2px; }
+.sec-title { font-size: 26px; line-height: 1.2; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: -1px; margin: 0; }
+.accent { width: 50px; height: 4px; background: var(--red); margin: 8px 0 12px; }
+.accent.center { margin-left: auto; margin-right: auto; }
+.sec-desc { font-size: 15px; color: var(--text-2); margin: 0; font-weight: 400; }
+@media (max-width: 640px) { .sec-title { font-size: 21px; } }
+
+.band { position: relative; padding: 56px 0; overflow: hidden; }
+.band-a { background: var(--band); }
+.band-b { background: var(--page); }
+.card { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 26px 28px; min-width: 0; position: relative; }
+@media (max-width: 640px) { .band { padding: 40px 0; } .card { padding: 20px 16px; } }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; padding: 6px 14px;
+  background: var(--navy); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; box-shadow: var(--shadow-tag); white-space: nowrap;
+}
+.tag.pill { border-radius: 50px; }
+.tag.red { background: var(--red); }
+.tag.blue { background: var(--blue); }
+
+/* ===== hero ===== */
+.hero {
+  position: relative; overflow: hidden; color: #fff;
+  background:
+    radial-gradient(1200px 400px at 85% -10%, rgba(0,67,255,.35), transparent 60%),
+    linear-gradient(120deg, #0c2749 0%, #000e35 70%);
+  padding: 56px 0 110px;
+}
+.hero-in { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 1; }
+.hero-pre { font-size: 20px; font-weight: 300; margin: 0 0 4px; color: rgba(255,255,255,.92); }
+.hero h1 { font-size: 34px; line-height: 1.15; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; margin: 0 0 14px; }
+.hero-sub { font-size: 15px; font-weight: 300; color: rgba(255,255,255,.8); margin: 0; max-width: 560px; }
+.premio-card { background: #fff; color: var(--text); border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,.25); padding: 22px 24px; display: flex; gap: 18px; align-items: center; }
+.trofeu { width: 64px; height: 64px; flex: none; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--red); display: grid; place-items: center; box-shadow: -4px 8px 16px rgba(220,28,46,.3); }
+.trofeu svg { transform: rotate(45deg); color: #fff; }
+.premio-card .lbl { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-2); }
+.premio-card .txt { font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.3; margin: 2px 0 6px; }
+.premio-card .lider { font-size: 13px; color: var(--text-2); font-weight: 400; }
+.premio-card .lider b { color: var(--navy); }
+@media (max-width: 900px) { .hero-in { grid-template-columns: 1fr; gap: 24px; } .hero h1 { font-size: 26px; } .hero-pre { font-size: 17px; } }
+
+/* ===== período (inspirado no widget de busca) ===== */
+.periodo { position: relative; z-index: 2; margin-top: -72px; margin-bottom: 0; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; background: #fff; border-radius: 8px 8px 0 0; padding: 8px 8px 0; width: fit-content; max-width: 100%; }
+.tab { border: 1px solid #cfd3da; border-radius: 4px; padding: 6px 14px; font-size: 14px; font-weight: 400; color: var(--text-2); background: #fff; white-space: nowrap; }
+.tab b { color: var(--navy); font-weight: 600; }
+.tab.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.tab.on b { color: #fff; }
+.periodo-box { background: #fff; border-radius: 0 8px 8px 8px; box-shadow: 0 12px 30px rgba(0,0,0,.12); padding: 16px; }
+.field { background: var(--field); border: 1px solid #e3e3e3; border-radius: 4px; padding: 12px 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--text-2); font-weight: 400; }
+.field b { color: var(--navy); }
+.track { height: 12px; border-radius: 4px; background: #e6e8ec; overflow: hidden; margin-top: 12px; }
+.track > i { display: block; height: 100%; background: var(--blue-grad); border-radius: 4px; min-width: 6px; transition: width .6s ease; }
+
+/* ===== indicadores em balão (seção "Por que REMAX?") ===== */
+.intro { text-align: center; }
+.intro-it { font-style: italic; font-weight: 400; color: var(--navy); font-size: 17px; margin: 0; }
+.intro-h { font-weight: 600; color: var(--navy); font-size: 20px; margin: 0; }
+.pins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+.pin-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; min-width: 0; }
+.pin-area { position: relative; width: 190px; height: 215px; display: grid; place-items: start center; }
+.pin, .pin-ghost { width: 165px; height: 165px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); position: absolute; top: 4px; }
+.pin-ghost { background: var(--red-soft); left: -18px; top: 26px; }
+.pin { background: var(--blue-bright); box-shadow: -8px 12px 25px rgba(12,39,73,.3); display: grid; place-items: center; }
+.pin-c { transform: rotate(45deg); color: #fff; display: flex; flex-direction: column; align-items: center; width: 130px; }
+.pin-c .pl { font-size: 9.6px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; line-height: 1.3; }
+.pin-c .pv { font-size: 32px; font-weight: 800; line-height: 1.05; letter-spacing: -1px; margin: 3px 0; white-space: nowrap; }
+.pin-c .pv.sm { font-size: 24px; }
+.pin-sub { font-size: 13px; color: var(--text-2); font-weight: 400; max-width: 220px; min-height: 20px; }
+.meta-trk { width: 160px; height: 6px; border-radius: 4px; background: #d9dbe0; overflow: hidden; margin: 8px auto 0; }
+.meta-trk i { display: block; height: 100%; background: var(--blue); }
+@media (max-width: 1000px) { .pins { grid-template-columns: repeat(2, 1fr); row-gap: 8px; } }
+@media (max-width: 480px) {
+  .pin-area { transform: scale(.8); height: 175px; margin: -10px 0 0; }
+  .pins { gap: 0; }
+  .pin-sub { font-size: 12px; max-width: 100%; padding: 0 4px; }
+  .meta-trk { width: 120px; }
+}
+
+/* ===== pódio (cartões no estilo dos cards de imóveis) ===== */
+.podio { display: grid; grid-template-columns: 1fr 1.12fr 1fr; gap: 22px; align-items: end; }
+@media (max-width: 860px) { .podio { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } .podio .p1 { order: -1; } }
+.pcard { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+.pcard.p1 { box-shadow: 0 14px 34px rgba(12,39,73,.18); }
+.pcard-top { position: relative; height: 150px; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(260px 150px at 80% 0%, rgba(0,67,255,.45), transparent 70%), linear-gradient(135deg, #0c2749, #000e35); }
+.p1 .pcard-top { height: 185px; }
+.pcard-top .tag { position: absolute; top: 14px; left: 14px; }
+.avatar {
+  --c: var(--s-muted);
+  width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: #fff; color: var(--navy); font-weight: 800; font-size: 25px; letter-spacing: -.5px;
+  box-shadow: inset 0 0 0 3px var(--c);
+  position: relative; overflow: hidden;
+}
+.p1 .avatar { width: 96px; height: 96px; font-size: 32px; box-shadow: inset 0 0 0 4px var(--c), 0 0 0 6px rgba(255,255,255,.12); }
+/* foto do corretor: cobre as iniciais e mantém o anel na cor do corretor por cima */
+.avatar.foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; border-radius: 50%; }
+.avatar.foto::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inherit; pointer-events: none; }
+.pcard-top .avatar.foto { width: 104px; height: 104px; }
+.p1 .pcard-top .avatar.foto { width: 132px; height: 132px; }
+.pcard-body { padding: 16px 18px 18px; }
+.pval { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -.5px; line-height: 1.2; }
+.p1 .pval { font-size: 32px; }
+.pval small { font-size: 14px; font-weight: 500; color: var(--text-2); margin-left: 4px; letter-spacing: 0; }
+.picons { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 10px; font-size: 13.5px; font-weight: 400; color: var(--text); }
+.picons span { display: inline-flex; align-items: center; gap: 6px; }
+.picons svg { color: var(--blue); }
+.pname { font-size: 16px; font-weight: 600; color: var(--navy); }
+.pgap { font-size: 13px; color: var(--text-2); font-weight: 400; margin-top: 2px; }
+.pcard.vazio .pcard-body { color: var(--muted); }
+
+/* ===== ranking ===== */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
+.tbl-wrap { overflow-x: auto; }
+table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rank th { text-align: left; font-size: 10.5px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; padding: 0 10px 10px; white-space: nowrap; border-bottom: 2px solid var(--navy); }
+.rank td { padding: 12px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 400; vertical-align: middle; }
+.rank th.n, .rank td.n { text-align: right; }
+.rank tbody tr { transition: background .15s; }
+.rank tbody tr:hover { background: #f7f8fa; }
+.rank tr.r1 td:first-child, .rank tr.r2 td:first-child, .rank tr.r3 td:first-child { box-shadow: inset 4px 0 0 var(--rc); }
+.rank tr.r1 { --rc: var(--red); background: rgba(220,28,46,.045); }
+.rank tr.r2 { --rc: var(--blue); background: rgba(0,61,165,.04); }
+.rank tr.r3 { --rc: var(--navy); background: rgba(12,39,73,.035); }
+.pos { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; font-size: 13px; background: var(--band); color: var(--text-2); }
+.r1 .pos, .r2 .pos, .r3 .pos { background: var(--rc); color: #fff; }
+.who { display: flex; align-items: center; gap: 10px; }
+.who .avatar { width: 34px; height: 34px; font-size: 12px; box-shadow: inset 0 0 0 2px var(--c); }
+.who b { font-weight: 600; color: var(--navy); }
+.ptsbar { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+.ptsbar .bar { width: 200px; height: 6px; border-radius: 4px; background: var(--band); overflow: hidden; }
+.ptsbar .bar i { display: block; height: 100%; background: var(--blue); border-radius: 4px; }
+.ptsbar b { min-width: 46px; text-align: right; color: var(--text); font-weight: 700; }
+.mov { font-size: 12.5px; font-weight: 700; }
+.mov.up { color: #0a7d32; }
+.mov.down { color: var(--red); }
+.mov.eq { color: var(--muted); }
+.mov.new { color: var(--blue); }
+@media (max-width: 760px) { .hide-sm { display: none; } .ptsbar .bar { width: 56px; } }
+@media (max-width: 520px) {
+  .ptsbar .bar, .who .avatar { display: none; }
+  .rank th, .rank td { padding-left: 6px; padding-right: 6px; }
+  .rank th { white-space: normal; }
+  .who b { white-space: normal; }
+}
+
+/* ===== últimas captações (estilo cards do blog) ===== */
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li { display: flex; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); align-items: flex-start; }
+.feed li:first-child { border-top: 0; padding-top: 0; }
+.feed .avatar { width: 38px; height: 38px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
+.feed .t { min-width: 0; flex: 1; }
+.feed .dt { font-size: 12px; color: var(--text); font-weight: 400; }
+.feed .im { font-size: 14.5px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.feed .by { font-size: 13px; color: var(--text-2); font-weight: 400; margin-top: 2px; }
+.feed .tag { margin-top: 2px; }
+
+/* ===== gráfico ===== */
+.chart-box { position: relative; height: 360px; }
+@media (max-width: 640px) { .chart-box { height: 280px; } }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.legend button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cfd3da; background: #fff; border-radius: 50px; padding: 5px 12px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--navy); }
+.legend button:hover { border-color: var(--navy); }
+.legend button.off { opacity: .4; }
+.legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* ===== regras ===== */
+.regras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 900px) { .regras { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .regras { grid-template-columns: 1fr; } }
+.regra { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.regra .fx { font-size: 14.5px; font-weight: 600; color: var(--navy); }
+.regra .tag { font-size: 11px; padding: 7px 14px; }
+.nota { font-size: 13px; color: var(--text-2); font-weight: 400; margin: 18px 0 0; }
+.nota b { color: var(--navy); }
+
+/* ===== rodapé ===== */
+.foot { background: var(--navy-900); color: rgba(255,255,255,.85); position: relative; overflow: hidden; }
+.foot-in { padding: 34px 24px; max-width: 1240px; margin: 0 auto; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+.foot .logo { height: 36px; }
+.foot-txt { font-size: 13px; font-weight: 400; line-height: 1.7; }
+.foot-txt b { color: #fff; font-weight: 600; }
+.foot-bar { background: var(--navy-950); text-align: center; font-size: 12px; color: rgba(255,255,255,.6); padding: 10px 16px; font-weight: 400; }
+
+/* ===== tela de aviso / carregamento ===== */
+.aviso-tela { min-height: 100vh; background: linear-gradient(120deg, #0c2749 0%, #000e35 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; position: relative; overflow: hidden; }
+.aviso-tela .logo { height: 48px; margin-bottom: 28px; }
+.aviso-card { background: #fff; border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,.3); padding: 30px 32px; max-width: 560px; width: 100%; position: relative; z-index: 1; }
+.aviso-card h1 { font-size: 22px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: -.5px; margin: 0; }
+.aviso-card p { color: var(--text-2); font-weight: 400; margin: 0; }
+.passos { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: p; }
+.passos li { counter-increment: p; display: flex; gap: 12px; padding: 8px 0; font-weight: 400; }
+.passos li::before { content: counter(p); flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; font-weight: 700; font-size: 13px; }
+.passos b { color: var(--navy); }
+.aviso-acoes { margin-top: 22px; }
+
+/* ===== avisos flutuantes ===== */
+.toasts { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 50; max-width: calc(100vw - 40px); }
+.toast { background: #fff; border-left: 4px solid var(--red); box-shadow: 0 10px 30px rgba(12,39,73,.25); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; animation: entra .35s ease; font-size: 14px; font-weight: 400; max-width: 420px; }
+.toast b { color: var(--navy); }
+.toast .avatar { width: 38px; height: 38px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
+@keyframes entra { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .toast, .btn-remax.girando svg { animation: none; } .track > i { transition: none; } }
+</style>
+</head>
+<body>
+
+<!-- ===================== CARREGANDO / AVISO ===================== -->
+<section id="vazio" class="aviso-tela">
+  <div class="slashes light" style="left:6%;bottom:10%"><i></i><i></i><i></i></div>
+  <img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot; style=&quot;margin-bottom:28px&quot;>RE/MAX</span>'">
+  <div class="aviso-card">
+    <h1 id="avisoTitulo">Carregando a planilha…</h1>
+    <div class="accent"></div>
+    <p id="avisoTexto">Buscando os dados mais recentes da campanha.</p>
+    <ol class="passos hidden" id="avisoPassos">
+      <li><span>Abra a pasta da campanha (<b>P:\ADMINISTRATIVO\CAMPANHA</b>).</span></li>
+      <li><span>Dê dois cliques em <b>Abrir Painel da Campanha</b>.</span></li>
+      <li><span>O painel abre no navegador já com os dados da planilha. Para ver novas captações, clique em <b>Atualizar</b>.</span></li>
+    </ol>
+    <div class="aviso-acoes hidden" id="avisoAcoes">
+      <button class="btn-remax" id="btnTentar">Tentar novamente</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="painel" class="hidden">
+  <header class="nav">
+    <div class="nav-in">
+      <img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'">
+      <span class="nav-sep"></span>
+      <span class="nav-title">Ranking de Captação</span>
+      <div class="nav-actions">
+        <span class="status" id="status" data-s="off"><span class="dot"></span><span id="statusTxt">—</span></span>
+        <button class="btn-remax" id="btnAtualizar" title="Buscar os dados mais recentes da planilha"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>Atualizar</button>
+        <button class="btn-square" id="btnTela" title="Tela cheia (modo TV)" aria-label="Tela cheia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- hero -->
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <p class="hero-pre">Campanha de captação de imóveis</p>
+        <h1 id="nomeCampanha">Campanha de Captação</h1>
+        <p class="hero-sub">Cada imóvel captado soma pontos: quanto maior o valor, maior a pontuação. Quem estiver em 1º lugar ao final da campanha leva o prêmio.</p>
+      </div>
+      <div class="premio-card">
+        <div class="trofeu"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></div>
+        <div style="min-width:0">
+          <div class="lbl" id="lblPremio">Prêmio para o 1º lugar</div>
+          <div class="txt" id="txtPremio">—</div>
+          <div class="lider" id="txtLider"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- período -->
+  <div class="wrap periodo">
+    <div class="tabs">
+      <span class="tab on">Início <b id="dtIni">—</b></span>
+      <span class="tab">Término <b id="dtFim">—</b></span>
+      <span class="tab" id="txtResta">—</span>
+    </div>
+    <div class="periodo-box">
+      <div class="field"><span>Período da campanha</span><span id="txtDia">—</span></div>
+      <div class="track" role="progressbar" aria-label="Andamento da campanha" aria-valuemin="0" aria-valuemax="100" id="trkPeriodo"><i id="barPeriodo" style="width:0"></i></div>
+    </div>
+  </div>
+
+  <!-- pódio -->
+  <section class="band band-b" style="padding-top:52px">
+    <div class="slashes" style="left:3%;bottom:30px"><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Destaques da campanha</p>
+        <h2 class="sec-title" id="tituloPodio">Pódio atual</h2>
+        <div class="accent"></div>
+        <p class="sec-desc" id="subPodio"></p>
+      </div>
+      <div class="podio" id="podio"></div>
+    </div>
+  </section>
+
+  <!-- indicadores -->
+  <section class="band band-a">
+    <div class="wrap">
+      <div class="intro">
+        <p class="intro-it">Como está a campanha?</p>
+        <h2 class="intro-h">Os números da campanha até agora</h2>
+        <div class="accent center"></div>
+      </div>
+      <div class="pins">
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Imóveis</span><span class="pv" id="kQtd">0</span><span class="pl">captados</span></div></div></div>
+          <div class="pin-sub" id="kQtdD"></div>
+          <div class="meta-trk hidden" id="kMetaTrk"><i id="kMetaBar"></i></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Valor total</span><span class="pv sm" id="kValor">R$ 0</span><span class="pl">captado</span></div></div></div>
+          <div class="pin-sub" id="kValorD"></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Pontos</span><span class="pv" id="kPts">0</span><span class="pl">distribuídos</span></div></div></div>
+          <div class="pin-sub" id="kPtsD"></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Corretores</span><span class="pv" id="kCor">0</span><span class="pl">pontuando</span></div></div></div>
+          <div class="pin-sub" id="kCorD"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ranking -->
+  <section class="band band-b">
+    <div class="wrap">
+      <div class="card">
+        <div class="sec-head">
+          <p class="eyebrow">Classificação completa</p>
+          <h2 class="sec-title">Ranking geral</h2>
+          <div class="accent"></div>
+          <p class="sec-desc">Ordenado por pontuação · coluna "7 dias" mostra quantas posições cada corretor subiu ou caiu na última semana.</p>
+        </div>
+        <div class="tbl-wrap">
+          <table class="rank">
+            <thead><tr>
+              <th style="width:48px">#</th><th>Corretor</th><th class="n">Pontos</th><th class="n">Imóveis</th><th class="n">Valor captado</th><th class="n hide-sm">Ticket médio</th><th class="n hide-sm">7 dias</th>
+            </tr></thead>
+            <tbody id="tbRanking"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- evolução + últimas captações -->
+  <section class="band band-a">
+    <div class="wrap grid2">
+      <div class="card">
+        <div class="sec-head">
+          <p class="eyebrow">Desempenho ao longo da campanha</p>
+          <h2 class="sec-title">Evolução da pontuação</h2>
+          <div class="accent"></div>
+          <p class="sec-desc">Pontos acumulados por corretor, dia a dia. Clique no nome de um corretor para mostrar ou ocultar a linha.</p>
+        </div>
+        <div class="chart-box"><canvas id="grafico" role="img" aria-label="Gráfico de evolução da pontuação acumulada por corretor"></canvas></div>
+        <div class="legend" id="legenda"></div>
+      </div>
+      <div class="card">
+        <div class="sec-head">
+          <p class="eyebrow">Fique por dentro</p>
+          <h2 class="sec-title">Últimas captações</h2>
+          <div class="accent"></div>
+        </div>
+        <ul class="feed" id="feed"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- regras -->
+  <section class="band band-b">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Como pontuar</p>
+        <h2 class="sec-title">Regras de pontuação</h2>
+        <div class="accent"></div>
+        <p class="sec-desc">Cada imóvel captado soma os pontos da faixa em que o seu valor se encaixa.</p>
+      </div>
+      <div class="regras" id="tbRegras"></div>
+      <p class="nota" id="notaDesempate"></p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'">
+      <div class="foot-txt" id="rodape"></div>
+    </div>
+    <div class="foot-bar">Painel interno da campanha de captação · dados lidos diretamente da planilha da campanha</div>
+  </footer>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO
+   ---------------------------------------------------------------------
+   A planilha é lida diretamente da pasta da campanha pelo servidor local
+   (servidor_painel.ps1). O nome/caminho do arquivo Excel é definido lá.
+   ===================================================================== */
+const CONFIG = {
+  ARQUIVO: 'planilha.xlsx',          // endereço interno servido pelo servidor_painel.ps1 (não alterar)
+  ATUALIZACAO_AUTOMATICA_MIN: 5,     // relê a planilha sozinho a cada N minutos (0 = só pelo botão Atualizar)
+  DIAS_VARIACAO: 7                   // janela da coluna "variação de posição"
+};
+
+/* Faixas padrão (usadas se a planilha não tiver a aba "Pontuação") */
+const FAIXAS_PADRAO = [
+  { min: 0,          max: 300000,  pontos: 10,  faixa: 'Até R$ 300 mil' },
+  { min: 300000.01,  max: 500000,  pontos: 20,  faixa: 'R$ 300 mil a R$ 500 mil' },
+  { min: 500000.01,  max: 800000,  pontos: 30,  faixa: 'R$ 500 mil a R$ 800 mil' },
+  { min: 800000.01,  max: 1200000, pontos: 45,  faixa: 'R$ 800 mil a R$ 1,2 milhão' },
+  { min: 1200000.01, max: 2000000, pontos: 65,  faixa: 'R$ 1,2 milhão a R$ 2 milhões' },
+  { min: 2000000.01, max: null,    pontos: 100, faixa: 'Acima de R$ 2 milhões' }
+];
+
+/* ============================ utilidades ============================ */
+const $ = id => document.getElementById(id);
+const DIA = 86400000;
+const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtInt = n => Math.round(n).toLocaleString('pt-BR');
+const fmtPts = n => (Math.round(n * 10) / 10).toLocaleString('pt-BR');
+const fmtBRL = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+function fmtBRLc(n) {
+  if (n >= 1e6) return 'R$ ' + (n / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: n >= 1e8 ? 0 : 1 }) + ' mi';
+  if (n >= 1e3) return 'R$ ' + Math.round(n / 1e3).toLocaleString('pt-BR') + ' mil';
+  return fmtBRL(n);
+}
+const fmtData = d => d ? d.toLocaleDateString('pt-BR') : '—';
+const fmtDiaMes = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+const hoje0 = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+const diasEntre = (a, b) => Math.round((b - a) / DIA);
+const iniciais = n => n.split(' ').filter(Boolean).filter((p, i, a) => i === 0 || i === a.length - 1).map(p => p[0]).join('').toUpperCase();
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function toNum(v) {
+  if (typeof v === 'number') return v;
+  if (v == null) return NaN;
+  let s = String(v).replace(/R\$|\s/g, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  return parseFloat(s);
+}
+function toDate(v) {
+  if (v == null || v === '') return null;
+  if (v instanceof Date) return isNaN(v) ? null : new Date(v.getFullYear(), v.getMonth(), v.getDate());
+  if (typeof v === 'number') { // número de série do Excel
+    const d = new Date(Math.round((v - 25569) * DIA));
+    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  }
+  const s = String(v).trim();
+  let m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return new Date(y, m[2] - 1, +m[1]); }
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return new Date(+m[1], m[2] - 1, +m[3]);
+  return null;
+}
+
+/* ===================== leitura da planilha ===================== */
+function linhas(ws) { return XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false }); }
+
+function lerFaixas(ws) {
+  if (!ws) return FAIXAS_PADRAO;
+  const L = linhas(ws);
+  const h = L.findIndex(r => r && r.some(c => /ponto/.test(norm(c))));
+  if (h < 0) return FAIXAS_PADRAO;
+  const cab = L[h].map(norm);
+  const col = re => cab.findIndex(c => re.test(c));
+  const cMin = col(/minim|a partir|^de$/), cMax = col(/maxim|^ate/), cPts = col(/ponto/), cLbl = col(/faixa|descri/);
+  if (cMin < 0 || cPts < 0) return FAIXAS_PADRAO;
+  const out = [];
+  for (const r of L.slice(h + 1)) {
+    if (!r) break;
+    const min = toNum(r[cMin]), pts = toNum(r[cPts]);
+    if (!isFinite(min) || !isFinite(pts)) break;
+    const max = cMax >= 0 ? toNum(r[cMax]) : NaN;
+    out.push({ min, max: isFinite(max) ? max : null, pontos: pts, faixa: cLbl >= 0 && r[cLbl] ? String(r[cLbl]) : null });
+  }
+  out.sort((a, b) => a.min - b.min);
+  out.forEach(f => { if (!f.faixa) f.faixa = f.max != null ? `${fmtBRLc(f.min)} a ${fmtBRLc(f.max)}` : `Acima de ${fmtBRLc(f.min)}`; });
+  return out.length ? out : FAIXAS_PADRAO;
+}
+function pontosPorValor(valor, faixas) {
+  let p = 0;
+  for (const f of faixas) if (valor >= f.min) p = f.pontos;
+  return p;
+}
+
+function lerCampanha(ws) {
+  const c = {};
+  if (!ws) return c;
+  for (const r of linhas(ws)) {
+    if (!r || r[0] == null || r[1] == null || r[1] === '') continue;
+    const k = norm(r[0]), v = r[1];
+    if (/nome|titulo/.test(k)) c.nome = String(v);
+    else if (/inicio/.test(k)) c.inicio = toDate(v);
+    else if (/termino|fim|encerra|final/.test(k)) c.fim = toDate(v);
+    else if (/premi/.test(k)) c.premio = String(v);
+    else if (/meta/.test(k)) { const n = toNum(v); if (n > 0) c.meta = n; }
+    else if (/desempate/.test(k)) c.desempate = String(v);
+  }
+  return c;
+}
+
+function lerPlanilha(buf) {
+  const wb = XLSX.read(buf, { type: 'array' });
+  const acha = re => wb.SheetNames.find(n => re.test(norm(n)));
+  const nCapt = acha(/capta|lancamento|dados/) || wb.SheetNames[0];
+  const nFx = wb.SheetNames.find(n => n !== nCapt && /pontua|faixa|regra/.test(norm(n)));
+  const nCamp = wb.SheetNames.find(n => n !== nCapt && /campanha|config/.test(norm(n)));
+
+  const faixas = lerFaixas(nFx && wb.Sheets[nFx]);
+  const campanha = lerCampanha(nCamp && wb.Sheets[nCamp]);
+
+  const L = linhas(wb.Sheets[nCapt]);
+  const h = L.findIndex(r => r && r.some(c => /corretor/.test(norm(c))));
+  if (h < 0) throw new Error(`Não encontrei a coluna "Corretor" na aba "${nCapt}".`);
+  const cab = L[h].map(norm), usadas = new Set(), col = {};
+  for (const [k, re] of [['valor', /valor/], ['data', /data/], ['pontos', /pontu|ponto/], ['corretor', /corretor/], ['imovel', /imovel|endereco|descri|codigo|referencia/]]) {
+    const i = cab.findIndex((c, j) => !usadas.has(j) && re.test(c));
+    if (i >= 0) { col[k] = i; usadas.add(i); }
+  }
+  if (col.valor == null) throw new Error('Não encontrei a coluna "Valor do Imóvel".');
+  if (col.data == null) throw new Error('Não encontrei a coluna "Data da Captação".');
+
+  const registros = []; let incompletas = 0;
+  for (const r of L.slice(h + 1)) {
+    if (!r || r.every(c => c == null || c === '')) continue;
+    const corretor = String(r[col.corretor] ?? '').replace(/\s+/g, ' ').trim();
+    const valor = toNum(r[col.valor]);
+    const data = toDate(r[col.data]);
+    if (!corretor || !(valor > 0) || !data) { incompletas++; continue; }
+    let pontos = col.pontos != null ? toNum(r[col.pontos]) : NaN;
+    if (!isFinite(pontos)) pontos = pontosPorValor(valor, faixas);
+    registros.push({ corretor, chave: norm(corretor), imovel: col.imovel != null && r[col.imovel] != null ? String(r[col.imovel]).trim() : '', valor, data, pontos });
+  }
+  return { campanha, faixas, registros, incompletas };
+}
+
+/* ========================= cálculos ========================= */
+function ranking(regs) {
+  const m = new Map();
+  for (const r of regs) {
+    let c = m.get(r.chave);
+    if (!c) { c = { chave: r.chave, nome: r.corretor, pontos: 0, qtd: 0, valor: 0, ultima: null }; m.set(r.chave, c); }
+    c.pontos += r.pontos; c.qtd++; c.valor += r.valor;
+    if (!c.ultima || r.data > c.ultima) c.ultima = r.data;
+  }
+  return [...m.values()].sort((a, b) => b.pontos - a.pontos || b.valor - a.valor || b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))
+    .map((c, i) => (c.pos = i + 1, c));
+}
+
+function calcular(dados) {
+  const camp = { ...dados.campanha };
+  const todas = dados.registros;
+  const datas = todas.map(r => +r.data);
+  if (!camp.inicio && datas.length) camp.inicio = new Date(Math.min(...datas));
+  if (!camp.fim && datas.length) camp.fim = new Date(Math.max(...datas));
+  const regs = todas.filter(r => (!camp.inicio || r.data >= camp.inicio) && (!camp.fim || r.data <= camp.fim));
+  const fora = todas.length - regs.length;
+
+  const rank = ranking(regs);
+  const hoje = hoje0();
+  const ref = camp.fim && hoje > camp.fim ? camp.fim : hoje;
+  const corte = new Date(ref - CONFIG.DIAS_VARIACAO * DIA);
+  const antes = new Map(ranking(regs.filter(r => r.data <= corte)).map(c => [c.chave, c.pos]));
+  for (const c of rank) c.posAntes = antes.get(c.chave) ?? null;
+
+  // cor fixa por corretor (ordem alfabética) — a cor acompanha a pessoa, nunca a posição
+  const alfa = [...rank].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const cor = new Map(alfa.map((c, i) => [c.chave, i < 8 ? `--s${i + 1}` : '--s-muted']));
+  for (const c of rank) c.cor = cor.get(c.chave);
+
+  return { camp, regs, rank, fora, hoje, faixas: dados.faixas, incompletas: dados.incompletas };
+}
+
+/* ========================= renderização ========================= */
+let estado = null, grafico = null, ocultos = new Set();
+/* Fotos dos corretores: arquivos da pasta FOTOS com o nome do corretor (ex.: "Carla Mendes.jpg").
+   A ligação é pelo nome — sem diferenciar maiúsculas/acentos — e também aceita só primeiro + último nome. */
+let fotos = new Map();
+const chaveFoto = arq => norm(String(arq).replace(/\.[^.]+$/, '').replace(/[_\-.]+/g, ' '));
+const primeiroUltimo = k => { const p = k.split(' '); return p.length > 2 ? `${p[0]} ${p[p.length - 1]}` : k; };
+async function carregarFotos() {
+  try {
+    const r = await fetch('fotos/lista.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const m = new Map();
+    for (const f of await r.json()) {
+      const url = 'fotos/' + encodeURIComponent(f.arquivo) + '?v=' + f.v;
+      const k = chaveFoto(f.arquivo);
+      m.set(k, url);
+      if (!m.has(primeiroUltimo(k))) m.set(primeiroUltimo(k), url);
+    }
+    fotos = m;
+  } catch (e) { /* sem fotos: o painel usa as iniciais */ }
+}
+const fotoDe = c => fotos.get(c.chave) || fotos.get(primeiroUltimo(c.chave));
+const avatar = c => {
+  const f = fotoDe(c);
+  const img = f ? `<img src="${f}" alt="" onerror="this.parentNode.classList.remove('foto');this.remove()">` : '';
+  return `<span class="avatar${f ? ' foto' : ''}" style="--c:var(${c.cor})" aria-hidden="true">${esc(iniciais(c.nome))}${img}</span>`;
+};
+const ICO_CASA = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>';
+const ICO_VALOR = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg>';
+const ICO_TROFEU = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg>';
+
+function render(dados) {
+  const E = estado = calcular(dados);
+  const { camp, regs, rank, hoje } = E;
+  $('vazio').classList.add('hidden');
+  $('painel').classList.remove('hidden');
+
+  // cabeçalho + período
+  const nome = camp.nome || 'Campanha de Captação';
+  $('nomeCampanha').textContent = nome;
+  document.title = 'RE/MAX · ' + nome;
+  $('dtIni').textContent = fmtData(camp.inicio);
+  $('dtFim').textContent = fmtData(camp.fim);
+  const total = camp.inicio && camp.fim ? diasEntre(camp.inicio, camp.fim) + 1 : 0;
+  const encerrada = camp.fim && hoje > camp.fim;
+  const naoComecou = camp.inicio && hoje < camp.inicio;
+  let dia = camp.inicio ? diasEntre(camp.inicio, hoje) + 1 : 0;
+  dia = Math.max(0, Math.min(dia, total));
+  $('barPeriodo').style.width = (total ? dia / total * 100 : 0) + '%';
+  $('trkPeriodo').setAttribute('aria-valuenow', Math.round(total ? dia / total * 100 : 0));
+  if (naoComecou) {
+    $('txtDia').innerHTML = `Começa em <b>${diasEntre(hoje, camp.inicio)} dia(s)</b>`;
+    $('txtResta').innerHTML = `<b>${total}</b> dias de duração`;
+  } else if (encerrada) {
+    $('txtDia').innerHTML = `<b>Campanha encerrada</b>`;
+    $('txtResta').innerHTML = `<b>${total}</b> dias de duração`;
+  } else {
+    const resta = total - dia;
+    $('txtDia').innerHTML = `Dia <b>${dia}</b> de <b>${total}</b> · <b>${fmtInt(total ? dia / total * 100 : 0)}%</b> concluído`;
+    $('txtResta').innerHTML = resta === 0 ? '<b>Último dia!</b>' : `Faltam <b>${resta}</b> dia${resta > 1 ? 's' : ''}`;
+  }
+
+  // prêmio
+  const lider = rank[0];
+  $('lblPremio').textContent = encerrada ? 'Prêmio do vencedor' : 'Prêmio para o 1º lugar';
+  $('txtPremio').textContent = camp.premio || 'Defina o prêmio na aba "Campanha" da planilha';
+  $('txtLider').innerHTML = lider
+    ? (encerrada ? `Vencedor: <b>${esc(lider.nome)}</b> com ${fmtPts(lider.pontos)} pontos` : `Liderando agora: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts`)
+    : 'Ainda sem captações';
+
+  // indicadores
+  const qtd = regs.length, valor = regs.reduce((s, r) => s + r.valor, 0), pts = regs.reduce((s, r) => s + r.pontos, 0);
+  $('kQtd').textContent = fmtInt(qtd);
+  if (camp.meta) {
+    const p = Math.min(100, qtd / camp.meta * 100);
+    $('kQtdD').innerHTML = `<b>${fmtInt(p)}%</b> da meta de ${fmtInt(camp.meta)} imóveis`;
+    $('kMetaTrk').classList.remove('hidden'); $('kMetaBar').style.width = p + '%';
+  } else {
+    $('kQtdD').textContent = dia ? `média de ${(qtd / Math.max(1, dia) * 7).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} por semana` : '';
+    $('kMetaTrk').classList.add('hidden');
+  }
+  $('kValor').textContent = fmtBRLc(valor);
+  $('kValor').title = fmtBRL(valor);
+  $('kValorD').textContent = qtd ? `ticket médio de ${fmtBRLc(valor / qtd)}` : '';
+  $('kPts').textContent = fmtPts(pts);
+  $('kPtsD').textContent = qtd ? `média de ${fmtPts(pts / qtd)} pts por imóvel` : '';
+  $('kCor').textContent = fmtInt(rank.length);
+  const semana = new Set(regs.filter(r => r.data > new Date(hoje - 7 * DIA)).map(r => r.chave)).size;
+  $('kCorD').textContent = encerrada ? 'com ao menos 1 captação' : `${semana} captaram nos últimos 7 dias`;
+
+  renderPodio(E, encerrada);
+  renderRanking(E);
+  renderFeed(E);
+  renderRegras(E);
+  renderGrafico(E);
+}
+
+function renderPodio(E, encerrada) {
+  const r = E.rank;
+  $('tituloPodio').textContent = encerrada ? 'Resultado final' : 'Pódio atual';
+  $('subPodio').textContent = r.length ? `Os três corretores com mais pontos entre os ${r.length} participantes do ranking.` : '';
+  const cls = ['red', 'blue', ''];
+  const card = (c, i) => {
+    const tag = `<span class="tag pill ${cls[i]}">${i === 0 ? ICO_TROFEU : ''}${i + 1}º lugar</span>`;
+    if (!c) return `<article class="pcard p${i + 1} vazio"><div class="pcard-top">${tag}</div><div class="pcard-body">Posição em aberto</div></article>`;
+    let gap = '';
+    if (i === 0) gap = r[1] ? `${fmtPts(c.pontos - r[1].pontos)} pts à frente do 2º colocado` : 'Liderança isolada';
+    else gap = `a ${fmtPts(r[i - 1].pontos - c.pontos)} pts do ${i}º colocado`;
+    return `<article class="pcard p${i + 1}">
+      <div class="pcard-top">${tag}${avatar(c)}</div>
+      <div class="pcard-body">
+        <div class="pval">${fmtPts(c.pontos)}<small>pontos</small></div>
+        <div class="picons"><span>${ICO_CASA}${c.qtd} imóve${c.qtd === 1 ? 'l' : 'is'}</span><span>${ICO_VALOR}${fmtBRLc(c.valor)}</span></div>
+        <div class="pname">${esc(c.nome)}</div>
+        <div class="pgap">${gap}</div>
+      </div>
+    </article>`;
+  };
+  $('podio').innerHTML = card(r[1], 1) + card(r[0], 0) + card(r[2], 2);
+}
+
+function renderRanking(E) {
+  const max = E.rank[0]?.pontos || 1;
+  $('tbRanking').innerHTML = E.rank.map(c => {
+    let mov;
+    if (c.posAntes == null) mov = `<span class="mov new">novo</span>`;
+    else if (c.posAntes > c.pos) mov = `<span class="mov up" title="Subiu ${c.posAntes - c.pos} posição(ões)">▲ ${c.posAntes - c.pos}</span>`;
+    else if (c.posAntes < c.pos) mov = `<span class="mov down" title="Caiu ${c.pos - c.posAntes} posição(ões)">▼ ${c.pos - c.posAntes}</span>`;
+    else mov = `<span class="mov eq" title="Mesma posição">=</span>`;
+    return `<tr class="${c.pos <= 3 ? 'r' + c.pos : ''}">
+      <td><span class="pos">${c.pos}</span></td>
+      <td><div class="who">${avatar(c)}<b>${esc(c.nome)}</b></div></td>
+      <td class="n"><div class="ptsbar"><span class="bar" aria-hidden="true"><i style="width:${Math.max(2, c.pontos / max * 100)}%"></i></span><b>${fmtPts(c.pontos)}</b></div></td>
+      <td class="n">${c.qtd}</td>
+      <td class="n" title="${fmtBRL(c.valor)}">${fmtBRLc(c.valor)}</td>
+      <td class="n hide-sm">${fmtBRLc(c.valor / c.qtd)}</td>
+      <td class="n hide-sm">${mov}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted)">Nenhuma captação no período da campanha.</td></tr>`;
+}
+
+function renderFeed(E) {
+  const porChave = new Map(E.rank.map(c => [c.chave, c]));
+  const ult = E.regs.map((r, i) => ({ r, i })).sort((a, b) => b.r.data - a.r.data || b.i - a.i).slice(0, 6);
+  $('feed').innerHTML = ult.map(({ r }) => {
+    const c = porChave.get(r.chave);
+    return `<li>${avatar(c)}<div class="t"><div class="dt">${fmtData(r.data)}</div><div class="im">${esc(r.imovel || 'Imóvel captado')}</div><div class="by">${esc(r.corretor)} · ${fmtBRLc(r.valor)}</div></div><span class="tag pill">+${fmtPts(r.pontos)} pts</span></li>`;
+  }).join('') || `<li style="color:var(--muted)">Nenhuma captação ainda.</li>`;
+}
+
+function renderRegras(E) {
+  $('tbRegras').innerHTML = E.faixas.map(f => `<div class="regra"><span class="fx">${esc(f.faixa)}</span><span class="tag pill red">${fmtPts(f.pontos)} pontos</span></div>`).join('');
+  $('notaDesempate').innerHTML = '<b>Critério de desempate:</b> ' + esc(E.camp.desempate || 'maior valor total captado; persistindo, maior número de imóveis.');
+}
+
+const crosshair = {
+  id: 'crosshair',
+  afterDatasetsDraw(chart) {
+    const a = chart.tooltip && chart.tooltip.getActiveElements();
+    if (!a || !a.length) return;
+    const x = a[0].element.x, { top, bottom } = chart.chartArea, ctx = chart.ctx;
+    ctx.save(); ctx.strokeStyle = '#9aa3b2'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+  }
+};
+
+function renderGrafico(E) {
+  if (!window.Chart) { $('legenda').textContent = 'Gráfico indisponível (sem conexão com a internet para carregar a biblioteca).'; return; }
+  const { camp, regs, rank, hoje } = E;
+  const ultimaData = regs.length ? new Date(Math.max(...regs.map(r => +r.data))) : hoje;
+  const ini = camp.inicio || ultimaData;
+  let fim = camp.fim && hoje > camp.fim ? camp.fim : hoje;
+  if (ultimaData > fim) fim = ultimaData;
+  if (fim < ini) fim = ini;
+  const n = diasEntre(ini, fim) + 1;
+  const labels = Array.from({ length: n }, (_, i) => fmtDiaMes(new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i)));
+
+  const porDia = new Map(rank.map(c => [c.chave, new Array(n).fill(0)]));
+  for (const r of regs) { const i = diasEntre(ini, r.data); if (i >= 0 && i < n) porDia.get(r.chave)[i] += r.pontos; }
+  const datasets = rank.map(c => {
+    let acc = 0;
+    const cor = cssVar(c.cor);
+    return {
+      label: c.nome, chave: c.chave,
+      data: porDia.get(c.chave).map(v => (acc += v)),
+      borderColor: cor, backgroundColor: cor,
+      borderWidth: c.cor === '--s-muted' ? 1.5 : 2,
+      pointRadius: 0, pointHoverRadius: 5, pointHoverBorderWidth: 2, pointHoverBorderColor: '#fff',
+      tension: 0, hidden: ocultos.has(c.chave)
+    };
+  });
+
+  if (grafico) {
+    grafico.data.labels = labels; grafico.data.datasets = datasets;
+    grafico.update('none');
+  } else {
+    Chart.defaults.font.family = '"Noto Sans", system-ui, sans-serif';
+    Chart.defaults.color = '#485c77';
+    grafico = new Chart($('grafico'), {
+      type: 'line',
+      data: { labels, datasets },
+      plugins: [crosshair],
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'index', intersect: false },
+        layout: { padding: { top: 6, right: 8 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#000e35', titleColor: '#fff', bodyColor: '#fff',
+            titleFont: { weight: '700' }, bodyFont: { weight: '400' },
+            cornerRadius: 8, padding: 12, boxPadding: 4, usePointStyle: true,
+            itemSort: (a, b) => b.parsed.y - a.parsed.y,
+            callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtPts(ctx.parsed.y)} pts` }
+          }
+        },
+        scales: {
+          x: { grid: { color: '#ecedeb', drawTicks: false }, border: { display: false }, ticks: { maxTicksLimit: 10, maxRotation: 0, padding: 8, font: { size: 12 } } },
+          y: { beginAtZero: true, grid: { color: '#ecedeb', drawTicks: false }, border: { display: false }, ticks: { padding: 8, font: { size: 12 }, callback: v => fmtInt(v) } }
+        }
+      }
+    });
+  }
+  // legenda clicável (mostrar/ocultar corretor)
+  $('legenda').innerHTML = rank.map(c => `<button type="button" data-k="${esc(c.chave)}" class="${ocultos.has(c.chave) ? 'off' : ''}" aria-pressed="${!ocultos.has(c.chave)}"><i style="background:var(${c.cor})"></i>${esc(c.nome)}</button>`).join('');
+}
+$('legenda').addEventListener('click', e => {
+  const b = e.target.closest('button[data-k]'); if (!b || !grafico) return;
+  const k = b.dataset.k;
+  ocultos.has(k) ? ocultos.delete(k) : ocultos.add(k);
+  grafico.data.datasets.forEach(d => d.hidden = ocultos.has(d.chave));
+  grafico.update('none');
+  b.classList.toggle('off', ocultos.has(k)); b.setAttribute('aria-pressed', !ocultos.has(k));
+});
+
+/* ========================= avisos (toast) ========================= */
+let assinaturaAnterior = null;
+const assinatura = r => [r.chave, r.imovel, r.valor, +r.data].join('|');
+function avisarNovidades(dados) {
+  const atuais = dados.registros.map(assinatura);
+  let qtdNovos = 0;
+  if (assinaturaAnterior) {
+    const antes = new Map();
+    assinaturaAnterior.forEach(s => antes.set(s, (antes.get(s) || 0) + 1));
+    const novos = [];
+    dados.registros.forEach((r, i) => { const s = atuais[i]; if (antes.get(s)) antes.set(s, antes.get(s) - 1); else novos.push(r); });
+    novos.slice(-3).forEach(r => {
+      const c = estado.rank.find(x => x.chave === r.chave);
+      if (!c) return;
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `${avatar(c)}<div><b>Nova captação!</b><br>${esc(r.corretor)} · ${fmtBRLc(r.valor)} · <b>+${fmtPts(r.pontos)} pts</b><br><span style="color:var(--text-2);font-size:13px">agora em ${c.pos}º lugar</span></div>`;
+      $('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 9000);
+    });
+    qtdNovos = novos.length;
+  }
+  assinaturaAnterior = atuais;
+  return qtdNovos;
+}
+
+/* ================= leitura da planilha (única fonte de dados) ================= */
+let ultimaLeitura = null, atualizando = false;
+
+function setStatus(s, html) { $('status').dataset.s = s; $('statusTxt').innerHTML = html; }
+const hora = d => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+function mostrarAviso(titulo, texto, { passos = false, tentar = false } = {}) {
+  $('painel').classList.add('hidden');
+  $('vazio').classList.remove('hidden');
+  $('avisoTitulo').textContent = titulo;
+  $('avisoTexto').innerHTML = texto;
+  $('avisoPassos').classList.toggle('hidden', !passos);
+  $('avisoAcoes').classList.toggle('hidden', !tentar);
+}
+function toastSimples(html, ms = 3500) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.innerHTML = `<div>${html}</div>`;
+  $('toasts').appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+function rodape(nome, salvoEm) {
+  const E = estado, partes = [`<b>${esc(E.camp.nome || 'Campanha de Captação')}</b>`, `Fonte: ${esc(nome)}`];
+  if (salvoEm) partes.push(`planilha salva em ${salvoEm.toLocaleString('pt-BR')}`);
+  if (E.fora) partes.push(`${E.fora} captação(ões) fora do período ignorada(s)`);
+  if (E.incompletas) partes.push(`${E.incompletas} linha(s) incompleta(s) ignorada(s)`);
+  $('rodape').innerHTML = partes.join(' · ');
+}
+
+// Busca a planilha na pasta (via servidor local) e recalcula tudo
+// LOCAL = aberto pelo servidor deste computador; senão, versão online (GitHub Pages)
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+async function atualizar(manual) {
+  if (atualizando) return;
+  if (location.protocol === 'file:') {
+    mostrarAviso('Abra o painel pelo atalho', 'Este arquivo foi aberto diretamente e, por segurança, o navegador não deixa ele ler a planilha sozinho. Use o atalho da pasta da campanha:', { passos: true });
+    return;
+  }
+  atualizando = true;
+  const btn = $('btnAtualizar');
+  btn.disabled = true; btn.classList.add('girando');
+  try {
+    let r;
+    try { r = await fetch(CONFIG.ARQUIVO + '?t=' + Date.now(), { cache: 'no-store' }); }
+    catch (e) {
+      if (LOCAL) throw Object.assign(new Error('O painel não está conectado à pasta da campanha. Feche esta aba e abra de novo pelo atalho "Abrir Painel da Campanha".'), { semServidor: true });
+      throw new Error('Não foi possível baixar os dados da campanha. Verifique sua conexão com a internet e tente novamente.');
+    }
+    if (!r.ok) throw new Error(LOCAL ? ((await r.text()) || `Erro ${r.status}`) : `Os dados da campanha não estão disponíveis no momento (erro ${r.status}). Tente novamente em alguns minutos.`);
+    let nome = decodeURIComponent(r.headers.get('X-Arquivo') || '') || 'planilha da campanha';
+    let salvo = r.headers.get('Last-Modified');
+    if (!LOCAL) { // versão online: nome e horário de salvamento vêm do info.json publicado junto
+      salvo = null;
+      try { const i = await (await fetch('info.json?t=' + Date.now(), { cache: 'no-store' })).json(); nome = i.planilha || nome; salvo = i.salvoEm || null; } catch (e) {}
+    }
+    const dados = lerPlanilha(await r.arrayBuffer());
+    await carregarFotos();
+    render(dados);
+    const novos = avisarNovidades(dados);
+    ultimaLeitura = new Date();
+    rodape(nome, salvo ? new Date(salvo) : null);
+    setStatus('ok', `Atualizado às <b>${hora(ultimaLeitura)}</b>`);
+    if (manual && !novos) toastSimples('<b>✓ Dados atualizados</b> com a versão mais recente da planilha.');
+  } catch (e) {
+    console.error(e);
+    if (estado) {
+      setStatus('err', 'Falha ao atualizar');
+      toastSimples(`<b>Não foi possível ler a planilha.</b><br><span style="color:var(--text-2)">${esc(e.message)}</span><br><span style="color:var(--muted);font-size:13px">Continuam exibidos os dados das ${hora(ultimaLeitura)}. Tente de novo em instantes.</span>`, 9000);
+    } else {
+      mostrarAviso('Não foi possível carregar a planilha', esc(e.message), { passos: !!e.semServidor, tentar: true });
+    }
+  } finally {
+    atualizando = false; btn.disabled = false; btn.classList.remove('girando');
+  }
+}
+
+/* ========================= interface ========================= */
+$('btnAtualizar').onclick = () => atualizar(true);
+$('btnTentar').onclick = () => {
+  if (!window.XLSX) return location.reload();
+  mostrarAviso('Carregando a planilha…', 'Buscando os dados mais recentes da campanha.');
+  atualizar(false);
+};
+$('btnTela').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+
+// inicialização
+if (!window.XLSX) {
+  mostrarAviso('Sem conexão com a internet', 'Não foi possível carregar o leitor de planilhas. Verifique a conexão e tente novamente.', { tentar: true });
+} else {
+  atualizar(false);
+  if (CONFIG.ATUALIZACAO_AUTOMATICA_MIN > 0) setInterval(() => atualizar(false), CONFIG.ATUALIZACAO_AUTOMATICA_MIN * 60000);
+}
+</script>
+</body>
+</html>
