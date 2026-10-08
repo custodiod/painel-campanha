@@ -661,7 +661,8 @@ function ranking(regs) {
     if (!c.ultima || r.data > c.ultima) c.ultima = r.data;
   }
   return [...m.values()].sort((a, b) => b.pontos - a.pontos || b.valor - a.valor || b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))
-    .map((c, i) => (c.pos = i + 1, c));
+    // mesma pontuação = mesma posição (padrão de competição: 1º, 1º, 3º)
+    .map((c, i, a) => (c.pos = i > 0 && Math.abs(c.pontos - a[i - 1].pontos) < 1e-9 ? a[i - 1].pos : i + 1, c));
 }
 
 function calcular(dados) {
@@ -752,11 +753,14 @@ function render(dados) {
 
   // prêmio
   const lider = rank[0];
+  const lideres = rank.filter(c => c.pos === 1);
+  const nomesLideres = lideres.map(c => `<b>${esc(c.nome)}</b>`).join(lideres.length > 2 ? ', ' : ' e ').replace(/, (?=[^,]*$)/, ' e ');
   $('lblPremio').textContent = encerrada ? 'Prêmio do vencedor' : 'Prêmio para o 1º lugar';
   $('txtPremio').textContent = camp.premio || 'Defina o prêmio na aba "Campanha" da planilha';
-  $('txtLider').innerHTML = lider
-    ? (encerrada ? `Vencedor: <b>${esc(lider.nome)}</b> com ${fmtPts(lider.pontos)} pontos` : `Liderando agora: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts`)
-    : 'Ainda sem captações';
+  $('txtLider').innerHTML = !lider ? 'Ainda sem captações'
+    : lideres.length > 1
+      ? (encerrada ? `Empate em 1º lugar: ${nomesLideres} com ${fmtPts(lider.pontos)} pontos` : `Empate na liderança: ${nomesLideres} · ${fmtPts(lider.pontos)} pts`)
+      : (encerrada ? `Vencedor: <b>${esc(lider.nome)}</b> com ${fmtPts(lider.pontos)} pontos` : `Liderando agora: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts`);
 
   // indicadores
   const qtd = regs.length, valor = regs.reduce((s, r) => s + r.valor, 0), pts = regs.reduce((s, r) => s + r.pontos, 0);
@@ -789,13 +793,18 @@ function renderPodio(E, encerrada) {
   const r = E.rank;
   $('tituloPodio').textContent = encerrada ? 'Resultado final' : 'Pódio atual';
   $('subPodio').textContent = r.length ? `Os três corretores com mais pontos entre os ${r.length} participantes do ranking.` : '';
-  const cls = ['red', 'blue', ''];
+  const cls = { 1: 'red', 2: 'blue', 3: '' };
   const card = (c, i) => {
-    const tag = `<span class="tag pill ${cls[i]}">${i === 0 ? ICO_TROFEU : ''}${i + 1}º lugar</span>`;
+    const pos = c ? c.pos : i + 1;   // empatados mostram a mesma posição
+    const tag = `<span class="tag pill ${cls[pos] ?? ''}">${pos === 1 ? ICO_TROFEU : ''}${pos}º lugar</span>`;
     if (!c) return `<article class="pcard p${i + 1} vazio"><div class="pcard-top">${tag}</div><div class="pcard-body">Posição em aberto</div></article>`;
-    let gap = '';
-    if (i === 0) gap = r[1] ? `${fmtPts(c.pontos - r[1].pontos)} pts à frente do 2º colocado` : 'Liderança isolada';
-    else gap = `a ${fmtPts(r[i - 1].pontos - c.pontos)} pts do ${i}º colocado`;
+    const empatados = r.filter(o => o !== c && o.pos === c.pos);
+    const acima = r.filter(o => o.pos < c.pos).pop();     // colocado imediatamente acima
+    const abaixo = r.find(o => o.pos > c.pos);            // colocado imediatamente abaixo
+    let gap;
+    if (empatados.length) gap = `Empatado em ${c.pos}º lugar com ${empatados.map(o => esc(o.nome)).join(', ')}`;
+    else if (c.pos === 1) gap = abaixo ? `${fmtPts(c.pontos - abaixo.pontos)} pts à frente do ${abaixo.pos}º colocado` : 'Liderança isolada';
+    else gap = `a ${fmtPts(acima.pontos - c.pontos)} pts do ${acima.pos}º colocado`;
     return `<article class="pcard p${i + 1}">
       <div class="pcard-top">${tag}${avatar(c)}</div>
       <div class="pcard-body">
@@ -851,7 +860,7 @@ function renderRegras(E) {
   const item = i => `<div class="regra"><span class="fx">${esc(i.txt)}</span><span class="tag pill ${i.pontos < 0 ? 'neg' : 'red'}">${sinal(i.pontos)} pontos</span></div>`;
   $('tbRegras').innerHTML = [...grupos].map(([g, itens]) =>
     `<div class="regra-grupo">${g ? `<h3 class="regra-tit">${esc(g)}</h3>` : ''}<div class="regras-lista">${itens.map(item).join('')}</div></div>`).join('');
-  $('notaDesempate').innerHTML = '<b>Critério de desempate:</b> ' + esc(E.camp.desempate || 'maior valor total captado; persistindo, maior número de imóveis.');
+  $('notaDesempate').innerHTML = '<b>Pontuações iguais ficam na mesma posição do ranking.</b> Critério de desempate para definir quem leva o prêmio: ' + esc(E.camp.desempate || 'maior valor total captado; persistindo, maior número de imóveis.');
 }
 
 const crosshair = {
