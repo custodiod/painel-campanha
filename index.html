@@ -837,7 +837,7 @@ function render(dados) {
   $('kValor').textContent = fmtBRLc(valor);
   $('kValor').title = fmtBRL(valor);
   $('kValorD').innerHTML = !qtd ? '' : temTipo
-    ? `Vendas <b>${fmtBRLc(vendas.reduce((s, r) => s + r.valor, 0))}</b> · Aluguéis <b>${fmtBRLc(locs.reduce((s, r) => s + r.valor, 0))}</b>/mês`
+    ? `Venda <b>${fmtBRLc(vendas.reduce((s, r) => s + r.valor, 0))}</b> · Locação <b>${fmtBRLc(locs.reduce((s, r) => s + r.valor, 0))}</b>`
     : `ticket médio de ${fmtBRLc(valor / qtd)}`;
   $('kPts').textContent = fmtPts(pts);
   $('kPtsD').textContent = qtd ? `média de ${fmtPts(pts / qtd)} pts por captação` : '';
@@ -920,7 +920,7 @@ function renderFeed(E) {
     // "Locação - Parceria" → etiqueta LOCAÇÃO + "Parceria"; só "Venda" → etiqueta VENDA + "Nova captação"
     const resto = r.tipo ? r.tipoTxt.replace(/^\s*(venda|loca[cç][aã]o|aluguel)\s*[-–:]?\s*/i, '') : r.tipoTxt;
     const desc = r.imovel || resto || 'Nova captação';
-    const val = r.tipo === 'locacao' ? `${fmtBRL(r.valor)}/mês` : fmtBRLc(r.valor);
+    const val = r.tipo === 'locacao' ? fmtBRL(r.valor) : fmtBRLc(r.valor);
     return `<li>${avatar(c)}<div class="t"><div class="dt">${fmtData(r.data)}</div><div class="im">${chip}${esc(desc)}</div><div class="by">${esc(r.corretor)} · ${val}</div></div><span class="pts ${r.pontos < 0 ? 'neg' : ''}">${r.pontos > 0 ? '+' : r.pontos < 0 ? '−' : ''}${fmtPts(Math.abs(r.pontos))} pts</span></li>`;
   }).join('') || `<li style="color:var(--muted)">Nenhuma captação ainda.</li>`;
 }
