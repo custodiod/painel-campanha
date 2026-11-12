@@ -4,510 +4,497 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#06143a">
-<meta name="apple-mobile-web-app-title" content="Captação Dominus">
+<meta name="theme-color" content="#000e35">
+<meta name="apple-mobile-web-app-title" content="Captação RE/MAX">
 <link rel="apple-touch-icon" href="logo-remax.png">
-<title>RE/MAX Dominus · Desafio Captação</title>
+<title>RE/MAX · Ranking de Captação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;0,800;0,900;1,900&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <style>
-/* ===== Identidade RE/MAX Dominus — painel executivo escuro + arte do Desafio Captação ===== */
+/* ===== Identidade RE/MAX (cores e medidas extraídas de remax.com.br) ===== */
 :root {
-  color-scheme: dark;
-  --bg-0: #040d26;
-  --bg-1: #07173c;
-  --card: #0a1d48;
-  --card-2: #0d2556;
-  --borda: rgba(74, 128, 255, .32);
-  --borda-forte: rgba(96, 150, 255, .55);
-  --linha: rgba(255, 255, 255, .08);
-  --texto: #ffffff;
-  --texto-2: #b9c9ec;
-  --muted: #8399c6;
-  --azul: #2563eb;
-  --azul-2: #3b82f6;
-  --azul-claro: #60a5fa;
-  --icone: linear-gradient(145deg, #3577ff 0%, #1741b5 100%);
-  --vermelho: #e3262f;
-  --vermelho-2: #ff4b55;
-  --verde: #22a447;
-  --verde-2: #3ccf6a;
-  --ouro: #f2b636;
-  --sombra: 0 10px 30px rgba(0, 0, 0, .35);
-  --raio: 14px;
-  --fonte-titulo: "Montserrat", "Segoe UI", sans-serif;
-  /* cores dos corretores no gráfico (paleta categórica validada para fundo escuro) */
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2fae3b; --s7:#9085e9; --s8:#e66767;
-  --s-muted: #5a6a8f;
+  color-scheme: light;
+  --navy-900: #000e35;      /* barra superior e rodapé */
+  --navy-950: #000a25;
+  --navy: #0c2749;          /* títulos, etiquetas */
+  --red: #dc1c2e;           /* botões, traço de destaque */
+  --red-soft: rgba(220, 28, 46, .10);
+  --blue: #003da5;          /* azul institucional */
+  --blue-bright: #0043ff;   /* balões de indicadores */
+  --blue-grad: linear-gradient(90deg, #2266ff 0%, #0043a8 100%);
+  --text: #404041;
+  --text-2: #485c77;
+  --muted: #8a94a6;
+  --page: #f3f3f3;
+  --band: #ecedeb;
+  --card: #ffffff;
+  --line: #e4e5e2;
+  --field: #f2f2f2;
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, .08);
+  --shadow-tag: 0 2px 8px rgba(0, 0, 0, .15);
+  --radius-card: 12px;
+  /* cores dos corretores no gráfico (paleta categórica validada p/ daltonismo) */
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --s-muted: #b9b8b1;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
-  color: var(--texto);
-  background:
-    radial-gradient(1100px 520px at 12% -8%, rgba(37, 99, 235, .28), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(227, 38, 47, .10), transparent 55%),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%) fixed;
-  background-color: var(--bg-0);
-  font: 400 15px/1.5 "Noto Sans", system-ui, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--text);
+  font: 300 16px/1.5 "Noto Sans", system-ui, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
 }
 b, strong { font-weight: 700; }
 button { font: inherit; color: inherit; }
 .hidden { display: none !important; }
-.wrap { max-width: 1440px; margin: 0 auto; padding: 0 28px; }
-@media (max-width: 640px) { .wrap { padding: 0 14px; } }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } }
 
-/* ===== cabeçalho ===== */
-.topo { padding: 22px 0 18px; border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, transparent, var(--borda-forte) 20%, var(--borda-forte) 80%, transparent) 1; }
-.topo-in { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-.marca { --h: 46px; display: inline-flex; flex-direction: column; align-items: center; flex: none; line-height: 1; }
+/* ===== barra superior ===== */
+.nav { background: var(--navy-900); box-shadow: 0 2px 4px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 20; }
+.nav-in { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 80px; display: flex; align-items: center; gap: 18px; }
+/* logo RE/MAX (branco) com "DOMINUS" centralizado logo abaixo; --h = altura do logo */
+.marca { --h: 40px; display: inline-flex; flex-direction: column; align-items: center; flex: none; line-height: 1; }
 .logo { height: var(--h); width: auto; display: block; }
-.logo-txt { color: #fff; font: 900 calc(var(--h) * .62) var(--fonte-titulo); letter-spacing: -1px; }
+.logo-txt { color: #fff; font-weight: 800; font-size: calc(var(--h) * .65); letter-spacing: -1px; }
+/* o PNG tem ~24% de sobra transparente embaixo: margem negativa aproxima o texto; padding-left compensa o espaçamento após a última letra */
 .marca-sub { color: #fff; font-weight: 500; font-size: calc(var(--h) * .33); letter-spacing: .38em; padding-left: .38em; margin-top: calc(var(--h) * -.16); white-space: nowrap; }
-.sep-v { width: 1px; align-self: stretch; background: var(--borda-forte); min-height: 56px; }
-.titulo { min-width: 0; }
-.desafio { display: inline-block; background: var(--vermelho); color: #fff; font: 800 11px var(--fonte-titulo); letter-spacing: .5em; padding: 4px 10px 4px 14px; border-radius: 4px; box-shadow: 0 4px 14px rgba(227, 38, 47, .4); }
-.titulo h1 { margin: 6px 0 2px; font: 900 34px/1.05 var(--fonte-titulo); letter-spacing: -.5px; text-transform: uppercase; }
-.titulo h1 .dominus { color: var(--vermelho-2); font-style: italic; letter-spacing: 0; text-shadow: 0 2px 18px rgba(227, 38, 47, .45); }
-.titulo .sub { font: 700 13px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-2); }
-.titulo .sub span { color: #fff; }
-.topo-dir { margin-left: auto; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
-.info { display: flex; align-items: center; gap: 12px; }
-.info svg { color: var(--texto-2); flex: none; }
-.info .rot { font: 700 11px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-2); }
-.info .val { font-weight: 600; font-size: 15px; white-space: nowrap; }
-.status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; vertical-align: 1px; }
-.status[data-s="ok"] .dot { background: var(--verde-2); box-shadow: 0 0 0 3px rgba(60, 207, 106, .25); }
-.status[data-s="err"] .dot { background: var(--vermelho-2); box-shadow: 0 0 0 3px rgba(255, 75, 85, .3); }
+.nav-sep { width: 1px; height: 28px; background: rgba(255,255,255,.25); }
+.nav-title { color: #fff; font-weight: 500; font-size: 15px; white-space: nowrap; }
+.nav-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,.8); font-size: 13px; font-weight: 400; white-space: nowrap; }
+.status b { color: #fff; font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #8a94a6; flex: none; }
+.status[data-s="ok"] .dot { background: #2ecc71; box-shadow: 0 0 0 3px rgba(46,204,113,.25); }
+.status[data-s="err"] .dot { background: var(--red); box-shadow: 0 0 0 3px rgba(220,28,46,.3); }
 .btn-remax {
   display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
-  background: linear-gradient(180deg, var(--vermelho-2), var(--vermelho)); color: #fff; border-radius: 50px; padding: 11px 22px;
-  font: 800 13px var(--fonte-titulo); letter-spacing: .06em; text-transform: uppercase;
-  box-shadow: 0 6px 18px rgba(227, 38, 47, .4); transition: filter .15s, transform .15s;
+  background: var(--red); color: #fff; border-radius: 50px; padding: 10px 22px;
+  font-size: 13.6px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  box-shadow: 0 6px 16px rgba(220,28,46,.28); transition: filter .15s, transform .15s;
 }
 .btn-remax:hover { filter: brightness(1.08); }
 .btn-remax:active { transform: translateY(1px); }
 .btn-remax:disabled { cursor: progress; opacity: .9; }
 .btn-remax.girando svg { animation: gira .8s linear infinite; }
 @keyframes gira { to { transform: rotate(360deg); } }
-.btn-quad { width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer; background: rgba(255, 255, 255, .04); color: #fff; border: 1px solid var(--borda-forte); border-radius: 10px; }
-.btn-quad:hover { background: rgba(255, 255, 255, .1); }
-.btn-remax:focus-visible, .btn-quad:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-@media (max-width: 1100px) { .topo-dir { margin-left: 0; width: 100%; } .sep-v.hide-md { display: none; } }
-@media (max-width: 640px) {
-  .titulo h1 { font-size: 26px; } .marca { --h: 38px; } .sep-v { display: none; }
-  .info.periodo-topo { display: none; } .topo-dir { gap: 10px; } .btn-remax { padding: 10px 16px; }
+.btn-square {
+  width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
+  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.9); border-radius: 4px;
+}
+.btn-square:hover { background: rgba(255,255,255,.08); }
+.btn-remax:focus-visible, .btn-square:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 760px) {
+  .nav-sep, .nav-title { display: none; }
+  .status span:last-child { display: none; }
+  .nav-in { padding: 0 16px; gap: 12px; height: 68px; }
+  .marca { --h: 34px; }
+  .btn-remax { padding: 9px 16px; }
 }
 
-/* ===== cards ===== */
-.secao { margin-top: 22px; }
-.card { background: linear-gradient(180deg, var(--card-2), var(--card)); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); padding: 20px 22px; min-width: 0; position: relative; }
-.sec-h { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; flex-wrap: wrap; }
-.sec-h svg { color: var(--azul-claro); flex: none; }
-.sec-h h2 { margin: 0; font: 800 17px var(--fonte-titulo); letter-spacing: .02em; text-transform: uppercase; }
-.sec-h .dir { margin-left: auto; font-size: 13px; color: var(--texto-2); }
-.sec-h .dir b { color: #fff; }
-.ico { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--icone); color: #fff; box-shadow: 0 6px 16px rgba(37, 99, 235, .35), inset 0 1px 0 rgba(255, 255, 255, .25); }
-.ico.vermelho { background: linear-gradient(145deg, #ff4b55, #b3121c); box-shadow: 0 6px 16px rgba(227, 38, 47, .4); }
-.ico.verde { background: linear-gradient(145deg, #3ccf6a, #13873a); box-shadow: 0 6px 16px rgba(34, 164, 71, .4); }
-.ico.p { width: 40px; height: 40px; }
+/* ===== elementos de marca ===== */
+.slashes { position: absolute; display: flex; gap: 10px; pointer-events: none; }
+.slashes i { width: 8px; height: 45px; border-radius: 4px; transform: skewX(-20deg); background: rgba(12,39,73,.08); }
+.slashes i.r { background: var(--red); }
+.slashes.light i { background: rgba(255,255,255,.08); }
+.slashes.light i.r { background: var(--red); }
 
-/* KPIs principais */
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-@media (max-width: 1150px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .kpis { grid-template-columns: 1fr; } }
-.kpi-h { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; border-bottom: 1px dashed rgba(255, 255, 255, .22); }
-.kpi-h .rot { font: 700 15px/1.25 var(--fonte-titulo); text-transform: uppercase; letter-spacing: .01em; }
-.kpi .val { font: 800 38px/1.1 var(--fonte-titulo); text-align: center; margin: 16px 0 6px; letter-spacing: -.5px; }
-.kpi .val.txt { font-size: 22px; line-height: 1.25; margin: 18px 0 8px; }
-.kpi .det { text-align: center; color: var(--texto-2); font-size: 14px; }
-.kpi .det b { color: #fff; }
-.kpi.verde { background: linear-gradient(180deg, #0f4a27, #0b3420); border-color: rgba(60, 207, 106, .55); }
-.kpi.verde .det { color: #c7f2d4; }
-.barra { height: 8px; border-radius: 6px; background: rgba(255, 255, 255, .1); overflow: hidden; margin-top: 12px; }
-.barra > i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #2f6bff, #60a5fa); min-width: 4px; transition: width .6s ease; }
-.barra.vermelha > i { background: linear-gradient(90deg, #b3121c, #ff4b55); }
-.barra.verde > i { background: linear-gradient(90deg, #13873a, #3ccf6a); }
+.sec-head { margin-bottom: 22px; }
+.eyebrow { font-size: 15px; font-weight: 400; color: var(--text-2); margin: 0 0 2px; }
+.sec-title { font-size: 26px; line-height: 1.2; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: -1px; margin: 0; }
+.accent { width: 50px; height: 4px; background: var(--red); margin: 8px 0 12px; }
+.accent.center { margin-left: auto; margin-right: auto; }
+.sec-desc { font-size: 15px; color: var(--text-2); margin: 0; font-weight: 400; }
+@media (max-width: 640px) { .sec-title { font-size: 21px; } }
 
-/* KPIs secundários */
-.kpis-p { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
-@media (max-width: 1250px) { .kpis-p { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 640px) { .kpis-p { grid-template-columns: repeat(2, 1fr); } }
-.kpi-p { padding: 16px; }
-.kpi-p .kpi-h { gap: 10px; padding-bottom: 10px; }
-.kpi-p .kpi-h .rot { font-size: 12.5px; line-height: 1.25; }
-.kpi-p .val { font: 800 27px/1.1 var(--fonte-titulo); text-align: center; margin: 12px 0 4px; }
-.kpi-p .det { text-align: center; font-size: 12.5px; color: var(--texto-2); }
-.kpi-p .barra { height: 6px; margin-top: 10px; }
+.band { position: relative; padding: 56px 0; overflow: hidden; }
+.band-a { background: var(--band); }
+.band-b { background: var(--page); }
+.card { background: var(--card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 26px 28px; min-width: 0; position: relative; }
+@media (max-width: 640px) { .band { padding: 40px 0; } .card { padding: 20px 16px; } }
 
-/* ===== linha do tempo (etapa atual animada) ===== */
-.linha-tempo { padding: 22px 26px 26px; }
-.trilho-area { position: relative; margin: 74px 6% 0; }
-.trilho { height: 8px; border-radius: 6px; background: rgba(255, 255, 255, .1); position: relative; }
-.trilho > i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--pos, 0%); border-radius: 6px; background: linear-gradient(90deg, #2f6bff, #60a5fa 70%, #ff4b55); transition: width .8s ease, height .8s ease; }
-.etapa { position: absolute; top: 4px; left: calc(var(--i) * 33.3333%); transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; width: 150px; }
-.etapa .no { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-1); border: 2px solid rgba(255, 255, 255, .25); color: var(--muted); position: relative; z-index: 1; }
-.etapa.feita .no { background: var(--azul); border-color: var(--azul-claro); color: #fff; }
-.etapa.atual .no { width: 42px; height: 42px; background: linear-gradient(145deg, #ff4b55, #b3121c); border-color: #fff; color: #fff; animation: pulsar 1.8s ease-out infinite; }
-.etapa.atual .no svg { animation: saltar 1.8s ease-in-out infinite; }
-.etapa .nome { margin-top: 10px; font: 800 13px var(--fonte-titulo); text-transform: uppercase; letter-spacing: .03em; color: var(--texto-2); text-align: center; white-space: nowrap; }
-.etapa .quando { font-size: 12px; color: var(--muted); text-align: center; white-space: nowrap; }
-.etapa.feita .nome { color: #fff; }
-.etapa.atual .nome { color: #fff; }
-.etapa.atual .quando::before { content: "ETAPA ATUAL"; display: block; margin: 4px auto 2px; width: fit-content; padding: 2px 8px; border-radius: 4px; background: var(--vermelho); color: #fff; font: 800 9.5px var(--fonte-titulo); letter-spacing: .12em; }
-/* balão RE/MAX flutuando no ponto de hoje */
-.balao { position: absolute; bottom: 18px; left: var(--pos, 0%); transform: translateX(-50%); width: 46px; z-index: 2; pointer-events: none; transition: left .8s ease, top .8s ease; }
-.balao svg { display: block; width: 46px; height: auto; animation: flutuar 3.2s ease-in-out infinite; transform-origin: 50% 100%; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
-.balao .hoje { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); font: 800 10px var(--fonte-titulo); letter-spacing: .12em; color: #fff; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .25); padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
-.sombra-balao { position: absolute; bottom: -1px; left: 50%; width: 22px; height: 6px; margin-left: -11px; border-radius: 50%; background: rgba(0, 0, 0, .45); animation: sombra 3.2s ease-in-out infinite; }
-@keyframes flutuar { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-12px) rotate(4deg); } }
-@keyframes sombra { 0%, 100% { transform: scaleX(1); opacity: .55; } 50% { transform: scaleX(.65); opacity: .3; } }
-@keyframes pulsar { 0% { box-shadow: 0 0 0 0 rgba(255, 75, 85, .65); } 70% { box-shadow: 0 0 0 16px rgba(255, 75, 85, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 75, 85, 0); } }
-@keyframes saltar { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-3px); } 60% { transform: translateY(1px); } }
-.linha-legenda { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 92px; padding-top: 14px; border-top: 1px dashed rgba(255, 255, 255, .18); font-size: 14px; color: var(--texto-2); }
-.linha-legenda b { color: #fff; }
-/* celular: linha do tempo na vertical (o balão sobe ao lado das etapas) */
-@media (max-width: 640px) {
-  .linha-tempo { padding: 18px 16px 20px; }
-  .sec-h .dir { margin-left: 0; width: 100%; }
-  .trilho-area { margin: 30px 0 0; height: 290px; }
-  .trilho { position: absolute; left: 21px; top: 0; bottom: 0; width: 6px; height: auto; }
-  .trilho > i { width: 100%; height: var(--pos, 0%); bottom: auto; background: linear-gradient(180deg, #2f6bff, #60a5fa 70%, #ff4b55); }
-  .etapa { left: 3px; top: calc(var(--i) * 33.3333%); transform: translateY(-50%); width: auto; display: grid; grid-template-columns: 42px auto; column-gap: 12px; align-items: center; justify-items: start; }
-  .etapa .no { grid-row: 1 / span 2; justify-self: center; }
-  .etapa .nome { margin: 0; text-align: left; font-size: 12.5px; }
-  .etapa .quando { text-align: left; }
-  .etapa.atual .quando::before { margin: 3px 0 2px; }
-  .balao { left: auto; right: 8%; top: calc(var(--pos, 0%) - 44px); bottom: auto; transform: none; }
-  .linha-legenda { margin-top: 30px; flex-direction: column; gap: 4px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; padding: 6px 14px;
+  background: var(--navy); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; box-shadow: var(--shadow-tag); white-space: nowrap;
+}
+.tag.pill { border-radius: 50px; }
+.tag.red { background: var(--red); }
+.tag.blue { background: var(--blue); }
+
+/* ===== hero ===== */
+.hero {
+  position: relative; overflow: hidden; color: #fff;
+  background:
+    radial-gradient(1200px 400px at 85% -10%, rgba(0,67,255,.35), transparent 60%),
+    linear-gradient(120deg, #0c2749 0%, #000e35 70%);
+  padding: 56px 0 110px;
+}
+.hero-in { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; position: relative; z-index: 1; }
+.hero-pre { font-size: 20px; font-weight: 300; margin: 0 0 4px; color: rgba(255,255,255,.92); }
+.hero h1 { font-size: 34px; line-height: 1.15; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; margin: 0 0 14px; }
+.hero-sub { font-size: 15px; font-weight: 300; color: rgba(255,255,255,.8); margin: 0; max-width: 560px; }
+.premio-card { background: #fff; color: var(--text); border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,.25); padding: 22px 24px; display: flex; gap: 18px; align-items: center; }
+.trofeu { width: 64px; height: 64px; flex: none; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--red); display: grid; place-items: center; box-shadow: -4px 8px 16px rgba(220,28,46,.3); }
+.trofeu svg { transform: rotate(45deg); color: #fff; }
+.premio-card .lbl { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-2); }
+.premio-card .txt { font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.3; margin: 2px 0 6px; }
+.premio-card .lider { font-size: 13px; color: var(--text-2); font-weight: 400; }
+.premio-card .lider b { color: var(--navy); }
+@media (max-width: 900px) { .hero-in { grid-template-columns: 1fr; gap: 24px; } .hero h1 { font-size: 26px; } .hero-pre { font-size: 17px; } }
+
+/* ===== período (inspirado no widget de busca) ===== */
+.periodo { position: relative; z-index: 2; margin-top: -72px; margin-bottom: 0; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; background: #fff; border-radius: 8px 8px 0 0; padding: 8px 8px 0; width: fit-content; max-width: 100%; }
+.tab { border: 1px solid #cfd3da; border-radius: 4px; padding: 6px 14px; font-size: 14px; font-weight: 400; color: var(--text-2); background: #fff; white-space: nowrap; }
+.tab b { color: var(--navy); font-weight: 600; }
+.tab.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.tab.on b { color: #fff; }
+.periodo-box { background: #fff; border-radius: 0 8px 8px 8px; box-shadow: 0 12px 30px rgba(0,0,0,.12); padding: 16px; }
+.field { background: var(--field); border: 1px solid #e3e3e3; border-radius: 4px; padding: 12px 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--text-2); font-weight: 400; }
+.field b { color: var(--navy); }
+.track { height: 12px; border-radius: 4px; background: #e6e8ec; overflow: hidden; margin-top: 12px; }
+.track > i { display: block; height: 100%; background: var(--blue-grad); border-radius: 4px; min-width: 6px; transition: width .6s ease; }
+
+/* ===== indicadores em balão (seção "Por que REMAX?") ===== */
+.intro { text-align: center; }
+.intro-it { font-style: italic; font-weight: 400; color: var(--navy); font-size: 17px; margin: 0; }
+.intro-h { font-weight: 600; color: var(--navy); font-size: 20px; margin: 0; }
+.pins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+.pin-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; min-width: 0; }
+.pin-area { position: relative; width: 190px; height: 215px; display: grid; place-items: start center; }
+.pin, .pin-ghost { width: 165px; height: 165px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); position: absolute; top: 4px; }
+.pin-ghost { background: var(--red-soft); left: -18px; top: 26px; }
+.pin { background: var(--blue-bright); box-shadow: -8px 12px 25px rgba(12,39,73,.3); display: grid; place-items: center; }
+.pin-c { transform: rotate(45deg); color: #fff; display: flex; flex-direction: column; align-items: center; width: 130px; }
+.pin-c .pl { font-size: 9.6px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; line-height: 1.3; }
+.pin-c .pv { font-size: 32px; font-weight: 800; line-height: 1.05; letter-spacing: -1px; margin: 3px 0; white-space: nowrap; }
+.pin-c .pv.sm { font-size: 24px; }
+.pin-sub { font-size: 13px; color: var(--text-2); font-weight: 400; max-width: 220px; min-height: 20px; }
+.meta-trk { width: 160px; height: 6px; border-radius: 4px; background: #d9dbe0; overflow: hidden; margin: 8px auto 0; }
+.meta-trk i { display: block; height: 100%; background: var(--blue); }
+@media (max-width: 1000px) { .pins { grid-template-columns: repeat(2, 1fr); row-gap: 8px; } }
+@media (max-width: 480px) {
+  .pin-area { transform: scale(.8); height: 175px; margin: -10px 0 0; }
+  .pins { gap: 0; }
+  .pin-sub { font-size: 12px; max-width: 100%; padding: 0 4px; }
+  .meta-trk { width: 120px; }
 }
 
-/* ===== pódio ===== */
-.podio { display: grid; grid-template-columns: 1fr 1.14fr 1fr; gap: 20px; align-items: end; }
-@media (max-width: 900px) { .podio { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; } .podio .p1 { order: -1; } }
-.pcard { border-radius: var(--raio); overflow: hidden; border: 1px solid var(--borda); background: var(--card); box-shadow: var(--sombra); }
-.pcard.p1 { border-color: rgba(255, 75, 85, .8); box-shadow: 0 0 0 1px rgba(255, 75, 85, .35), 0 18px 40px rgba(227, 38, 47, .25); }
-.pcard-top { position: relative; height: 160px; display: grid; place-items: center; background: radial-gradient(280px 160px at 50% 0%, rgba(59, 130, 246, .45), transparent 70%), linear-gradient(180deg, #102c66, #0a1d48); }
-.p1 .pcard-top { height: 196px; background: radial-gradient(300px 190px at 50% 0%, rgba(255, 75, 85, .45), transparent 70%), linear-gradient(180deg, #2a1240, #0a1d48); }
+/* ===== pódio (cartões no estilo dos cards de imóveis) ===== */
+.podio { display: grid; grid-template-columns: 1fr 1.12fr 1fr; gap: 22px; align-items: end; }
+@media (max-width: 860px) { .podio { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; } .podio .p1 { order: -1; } }
+.pcard { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+.pcard.p1 { box-shadow: 0 14px 34px rgba(12,39,73,.18); }
+.pcard-top { position: relative; height: 150px; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(260px 150px at 80% 0%, rgba(0,67,255,.45), transparent 70%), linear-gradient(135deg, #0c2749, #000e35); }
+.p1 .pcard-top { height: 185px; }
 .pcard-top .tag { position: absolute; top: 14px; left: 14px; }
 .avatar {
   --c: var(--s-muted);
   width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; flex: none;
-  background: #e8eefc; color: #0a1d48; font: 800 25px var(--fonte-titulo); letter-spacing: -.5px;
-  box-shadow: inset 0 0 0 3px var(--c); position: relative; overflow: hidden;
+  background: #fff; color: var(--navy); font-weight: 800; font-size: 25px; letter-spacing: -.5px;
+  box-shadow: inset 0 0 0 3px var(--c);
+  position: relative; overflow: hidden;
 }
-.p1 .avatar { width: 96px; height: 96px; font-size: 32px; box-shadow: inset 0 0 0 4px var(--c), 0 0 0 6px rgba(255, 255, 255, .1); }
+.p1 .avatar { width: 96px; height: 96px; font-size: 32px; box-shadow: inset 0 0 0 4px var(--c), 0 0 0 6px rgba(255,255,255,.12); }
+/* foto do corretor: cobre as iniciais e mantém o anel na cor do corretor por cima */
 .avatar.foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; border-radius: 50%; }
 .avatar.foto::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inherit; pointer-events: none; }
-.pcard-top .avatar.foto { width: 108px; height: 108px; }
-.p1 .pcard-top .avatar.foto { width: 138px; height: 138px; }
+.pcard-top .avatar.foto { width: 104px; height: 104px; }
+.p1 .pcard-top .avatar.foto { width: 132px; height: 132px; }
 .pcard-body { padding: 16px 18px 18px; }
-.pval { font: 800 30px/1.1 var(--fonte-titulo); letter-spacing: -.5px; }
-.p1 .pval { font-size: 36px; color: #fff; }
-.pval small { font: 600 14px "Noto Sans", sans-serif; color: var(--texto-2); margin-left: 5px; letter-spacing: 0; }
-.picons { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 10px; font-size: 13.5px; color: var(--texto-2); }
+.pval { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -.5px; line-height: 1.2; }
+.p1 .pval { font-size: 32px; }
+.pval small { font-size: 14px; font-weight: 500; color: var(--text-2); margin-left: 4px; letter-spacing: 0; }
+.picons { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 10px; font-size: 13.5px; font-weight: 400; color: var(--text); }
 .picons span { display: inline-flex; align-items: center; gap: 6px; }
-.picons svg { color: var(--azul-claro); }
-.pname { font: 800 17px var(--fonte-titulo); }
-.pgap { font-size: 13px; color: var(--texto-2); margin-top: 2px; }
+.picons svg { color: var(--blue); }
+.pname { font-size: 16px; font-weight: 600; color: var(--navy); }
+.pgap { font-size: 13px; color: var(--text-2); font-weight: 400; margin-top: 2px; }
 .pcard.vazio .pcard-body { color: var(--muted); }
-.tag {
-  display: inline-flex; align-items: center; gap: 6px; border-radius: 50px; padding: 6px 13px;
-  background: #33507f; color: #fff; font: 800 10.5px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
-}
-.tag.red { background: linear-gradient(180deg, var(--vermelho-2), var(--vermelho)); box-shadow: 0 4px 12px rgba(227, 38, 47, .45); }
-.tag.blue { background: linear-gradient(180deg, #3b82f6, #1d4ed8); }
 
 /* ===== ranking ===== */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
 .tbl-wrap { overflow-x: auto; }
-table.rank { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-.rank th { text-align: left; font: 700 11px var(--fonte-titulo); color: var(--texto-2); text-transform: uppercase; letter-spacing: .08em; padding: 11px 12px; white-space: nowrap; background: rgba(37, 99, 235, .16); }
-.rank th:first-child { border-radius: 8px 0 0 8px; } .rank th:last-child { border-radius: 0 8px 8px 0; }
-.rank td { padding: 12px; border-bottom: 1px solid var(--linha); white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: middle; }
+table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rank th { text-align: left; font-size: 10.5px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; padding: 0 10px 10px; white-space: nowrap; border-bottom: 2px solid var(--navy); }
+.rank td { padding: 12px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 400; vertical-align: middle; }
 .rank th.n, .rank td.n { text-align: right; }
-.rank tbody tr:hover { background: rgba(255, 255, 255, .03); }
+.rank tbody tr { transition: background .15s; }
+.rank tbody tr:hover { background: #f7f8fa; }
 .rank tr.r1 td:first-child, .rank tr.r2 td:first-child, .rank tr.r3 td:first-child { box-shadow: inset 4px 0 0 var(--rc); }
-.rank tr.r1 { --rc: var(--vermelho-2); background: rgba(227, 38, 47, .09); }
-.rank tr.r2 { --rc: var(--azul-2); background: rgba(59, 130, 246, .08); }
-.rank tr.r3 { --rc: #7f93bd; background: rgba(127, 147, 189, .07); }
-.pos { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font: 800 13px var(--fonte-titulo); background: rgba(255, 255, 255, .08); color: var(--texto-2); }
+.rank tr.r1 { --rc: var(--red); background: rgba(220,28,46,.045); }
+.rank tr.r2 { --rc: var(--blue); background: rgba(0,61,165,.04); }
+.rank tr.r3 { --rc: var(--navy); background: rgba(12,39,73,.035); }
+.pos { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 700; font-size: 13px; background: var(--band); color: var(--text-2); }
 .r1 .pos, .r2 .pos, .r3 .pos { background: var(--rc); color: #fff; }
 .who { display: flex; align-items: center; gap: 10px; }
-.who .avatar { width: 36px; height: 36px; font-size: 12px; box-shadow: inset 0 0 0 2px var(--c); }
-.who b { font-weight: 600; }
-.ptsbar { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
-.ptsbar .bar { width: 220px; height: 8px; border-radius: 6px; background: rgba(255, 255, 255, .08); overflow: hidden; }
-.ptsbar .bar i { display: block; height: 100%; background: linear-gradient(90deg, #2f6bff, #60a5fa); border-radius: 6px; }
-.ptsbar b { min-width: 46px; text-align: right; font: 800 15px var(--fonte-titulo); }
+.who .avatar { width: 34px; height: 34px; font-size: 12px; box-shadow: inset 0 0 0 2px var(--c); }
+.who b { font-weight: 600; color: var(--navy); }
+.ptsbar { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+.ptsbar .bar { width: 200px; height: 6px; border-radius: 4px; background: var(--band); overflow: hidden; }
+.ptsbar .bar i { display: block; height: 100%; background: var(--blue); border-radius: 4px; }
+.ptsbar b { min-width: 46px; text-align: right; color: var(--text); font-weight: 700; }
 .mov { font-size: 12.5px; font-weight: 700; }
-.mov.up { color: var(--verde-2); } .mov.down { color: var(--vermelho-2); } .mov.eq { color: var(--muted); } .mov.new { color: var(--azul-claro); }
-@media (max-width: 900px) { .hide-sm { display: none; } .ptsbar .bar { width: 80px; } }
-@media (max-width: 560px) {
+.mov.up { color: #0a7d32; }
+.mov.down { color: var(--red); }
+.mov.eq { color: var(--muted); }
+.mov.new { color: var(--blue); }
+@media (max-width: 760px) { .hide-sm { display: none; } .ptsbar .bar { width: 56px; } }
+@media (max-width: 520px) {
   .ptsbar .bar, .who .avatar { display: none; }
   .rank th, .rank td { padding-left: 6px; padding-right: 6px; }
-  .rank th { white-space: normal; } .who b { white-space: normal; }
+  .rank th { white-space: normal; }
+  .who b { white-space: normal; }
 }
 
-/* ===== gráfico + últimas ===== */
-.grid2 { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 20px; }
-@media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
-.chart-box { position: relative; height: 340px; }
-@media (max-width: 640px) { .chart-box { height: 270px; } }
-.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-.legend button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--borda); background: rgba(255, 255, 255, .03); border-radius: 50px; padding: 5px 12px; cursor: pointer; font-size: 13px; color: #fff; }
-.legend button:hover { border-color: var(--borda-forte); }
+/* ===== últimas captações (estilo cards do blog) ===== */
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li { display: flex; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); align-items: flex-start; }
+.feed li:first-child { border-top: 0; padding-top: 0; }
+.feed .avatar { width: 38px; height: 38px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
+.feed .t { min-width: 0; flex: 1; }
+.feed .dt { font-size: 12px; color: var(--text); font-weight: 400; }
+.feed .im { font-size: 14.5px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.feed .by { font-size: 13px; color: var(--text-2); font-weight: 400; margin-top: 2px; }
+.feed .tag { margin-top: 2px; }
+
+/* ===== gráfico ===== */
+.chart-box { position: relative; height: 360px; }
+@media (max-width: 640px) { .chart-box { height: 280px; } }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.legend button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cfd3da; background: #fff; border-radius: 50px; padding: 5px 12px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--navy); }
+.legend button:hover { border-color: var(--navy); }
 .legend button.off { opacity: .4; }
 .legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
-.feed { list-style: none; margin: 0; padding: 0; }
-.feed li { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--linha); align-items: flex-start; }
-.feed li:first-child { border-top: 0; padding-top: 0; }
-.feed .avatar { width: 40px; height: 40px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
-.feed .t { min-width: 0; flex: 1; }
-.feed .dt { font-size: 12px; color: var(--muted); }
-.feed .im { font-weight: 600; line-height: 1.3; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.feed .by { font-size: 13px; color: var(--texto-2); margin-top: 2px; }
-.chip { font: 800 9.5px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: #33507f; }
-.chip.venda { background: var(--vermelho); } .chip.locacao { background: var(--azul); }
-.pts { font: 800 14px var(--fonte-titulo); white-space: nowrap; color: var(--verde-2); }
-.pts.neg { color: var(--vermelho-2); }
 
-/* ===== regras (blocos no estilo da arte do Desafio) ===== */
-.regras { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 22px; align-items: start; }
-@media (max-width: 420px) { .regras { grid-template-columns: 1fr; } }
-.bloco { border-radius: var(--raio); overflow: hidden; box-shadow: var(--sombra); background: #fff; color: #0a1d48; }
-.bloco-h { display: flex; align-items: center; gap: 16px; padding: 18px 20px; color: #fff; background: linear-gradient(135deg, #1d4ed8, #0b2a8c); }
-.bloco.venda .bloco-h { background: linear-gradient(135deg, #ff3b46, #b3121c); }
-.bloco-h .circ { width: 62px; height: 62px; border-radius: 50%; border: 3px solid #fff; display: grid; place-items: center; flex: none; }
-.bloco-h h3 { margin: 0; font: 900 21px/1.1 var(--fonte-titulo); text-transform: uppercase; }
-.bloco-h .tipo { font: 700 12px var(--fonte-titulo); letter-spacing: .4em; margin-top: 4px; }
-.bloco table { width: calc(100% - 24px); margin: 12px; border-collapse: collapse; }
-.bloco th { font: 800 12px var(--fonte-titulo); letter-spacing: .08em; text-transform: uppercase; padding: 9px 12px; background: #e9eefa; color: #0a1d48; }
-.bloco.venda th { background: #fbe4e6; }
-.bloco th:last-child, .bloco td:last-child { text-align: center; width: 120px; border-left: 1px solid #dbe2f0; }
-.bloco td { padding: 11px 12px; border-top: 1px solid #e3e8f2; font-size: 14.5px; line-height: 1.35; color: #1b2c55; }
-.bloco .pt { font: 900 24px/1 var(--fonte-titulo); color: #1d4ed8; white-space: nowrap; }
-.bloco.venda .pt { color: #d61f2b; }
-.bloco .pt small { display: block; font: 800 12px var(--fonte-titulo); margin-top: 1px; }
-.bloco .pt.neg { color: #0a1d48; }
-.nota { font-size: 13px; color: var(--texto-2); margin: 16px 0 0; }
-.nota b { color: #fff; }
+/* ===== regras ===== */
+.regra-grupo + .regra-grupo { margin-top: 26px; }
+.regra-tit { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 14px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: .5px; }
+.regra-tit::before { content: ""; width: 4px; height: 18px; background: var(--red); border-radius: 2px; }
+.regras-lista { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 760px) { .regras-lista { grid-template-columns: 1fr; } }
+.regra { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 15px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.regra .fx { font-size: 14.5px; font-weight: 600; color: var(--navy); line-height: 1.35; }
+.regra .tag { font-size: 11px; padding: 7px 14px; flex: none; }
+.tag.neg { background: #fff; color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
+.nota { font-size: 13px; color: var(--text-2); font-weight: 400; margin: 18px 0 0; }
+.nota b { color: var(--navy); }
 
 /* ===== rodapé ===== */
-.rodape { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 22px 0 30px; padding: 14px 18px; font-size: 13px; color: var(--texto-2); }
-.rodape svg { color: var(--texto-2); flex: none; }
-.rodape .marca { --h: 30px; margin-left: auto; }
+.foot { background: var(--navy-900); color: rgba(255,255,255,.85); position: relative; overflow: hidden; }
+.foot-in { padding: 34px 24px; max-width: 1240px; margin: 0 auto; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+.foot .marca { --h: 40px; }
+.foot-txt { font-size: 13px; font-weight: 400; line-height: 1.7; }
+.foot-txt b { color: #fff; font-weight: 600; }
+.foot-bar { background: var(--navy-950); text-align: center; font-size: 12px; color: rgba(255,255,255,.6); padding: 10px 16px; font-weight: 400; }
 
 /* ===== tela de aviso / carregamento ===== */
-.aviso-tela { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; }
-.aviso-tela .marca { --h: 56px; margin-bottom: 28px; }
-.aviso-card { background: #fff; color: #0a1d48; border-radius: var(--raio); box-shadow: 0 12px 40px rgba(0, 0, 0, .4); padding: 30px 32px; max-width: 560px; width: 100%; }
-.aviso-card h1 { font: 900 22px var(--fonte-titulo); text-transform: uppercase; margin: 0; }
-.aviso-card .traco { width: 50px; height: 4px; background: var(--vermelho); margin: 8px 0 12px; }
-.aviso-card p { color: #485c77; margin: 0; }
+.aviso-tela { min-height: 100vh; background: linear-gradient(120deg, #0c2749 0%, #000e35 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; position: relative; overflow: hidden; }
+.aviso-tela .marca { --h: 52px; margin-bottom: 28px; }
+.aviso-card { background: #fff; border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,.3); padding: 30px 32px; max-width: 560px; width: 100%; position: relative; z-index: 1; }
+.aviso-card h1 { font-size: 22px; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: -.5px; margin: 0; }
+.aviso-card p { color: var(--text-2); font-weight: 400; margin: 0; }
 .passos { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: p; }
-.passos li { counter-increment: p; display: flex; gap: 12px; padding: 8px 0; color: #1b2c55; }
-.passos li::before { content: counter(p); flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--azul); color: #fff; font-weight: 700; font-size: 13px; }
+.passos li { counter-increment: p; display: flex; gap: 12px; padding: 8px 0; font-weight: 400; }
+.passos li::before { content: counter(p); flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; font-weight: 700; font-size: 13px; }
+.passos b { color: var(--navy); }
 .aviso-acoes { margin-top: 22px; }
 
 /* ===== avisos flutuantes ===== */
 .toasts { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 50; max-width: calc(100vw - 40px); }
-.toast { background: var(--card-2); border: 1px solid var(--borda-forte); border-left: 4px solid var(--vermelho-2); box-shadow: 0 12px 30px rgba(0, 0, 0, .5); border-radius: 10px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; animation: entra .35s ease; font-size: 14px; max-width: 420px; }
-.toast .avatar { width: 40px; height: 40px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
+.toast { background: #fff; border-left: 4px solid var(--red); box-shadow: 0 10px 30px rgba(12,39,73,.25); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; animation: entra .35s ease; font-size: 14px; font-weight: 400; max-width: 420px; }
+.toast b { color: var(--navy); }
+.toast .avatar { width: 38px; height: 38px; font-size: 13px; box-shadow: inset 0 0 0 2px var(--c); }
 @keyframes entra { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) {
-  .toast, .btn-remax.girando svg, .balao svg, .sombra-balao, .etapa.atual .no, .etapa.atual .no svg { animation: none; }
-  .barra > i, .trilho > i, .balao { transition: none; }
-}
+@media (prefers-reduced-motion: reduce) { .toast, .btn-remax.girando svg { animation: none; } .track > i { transition: none; } }
 </style>
 </head>
 <body>
 
 <!-- ===================== CARREGANDO / AVISO ===================== -->
 <section id="vazio" class="aviso-tela">
+  <div class="slashes light" style="left:6%;bottom:10%"><i></i><i></i><i></i></div>
   <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
   <div class="aviso-card">
     <h1 id="avisoTitulo">Carregando a planilha…</h1>
-    <div class="traco"></div>
+    <div class="accent"></div>
     <p id="avisoTexto">Buscando os dados mais recentes da campanha.</p>
     <ol class="passos hidden" id="avisoPassos">
       <li><span>Abra a pasta da campanha (<b>P:\ADMINISTRATIVO\CAMPANHA</b>).</span></li>
       <li><span>Dê dois cliques em <b>Abrir Painel da Campanha</b>.</span></li>
       <li><span>O painel abre no navegador já com os dados da planilha. Para ver novas captações, clique em <b>Atualizar</b>.</span></li>
     </ol>
-    <div class="aviso-acoes hidden" id="avisoAcoes"><button class="btn-remax" id="btnTentar">Tentar novamente</button></div>
+    <div class="aviso-acoes hidden" id="avisoAcoes">
+      <button class="btn-remax" id="btnTentar">Tentar novamente</button>
+    </div>
   </div>
 </section>
 
-<!-- ===================== PAINEL ===================== -->
+<!-- ===================== DASHBOARD ===================== -->
 <div id="painel" class="hidden">
-  <header class="topo">
-    <div class="wrap topo-in">
+  <header class="nav">
+    <div class="nav-in">
       <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
-      <span class="sep-v"></span>
-      <div class="titulo">
-        <span class="desafio">DESAFIO</span>
-        <h1>Captação <span class="dominus">Dominus</span></h1>
-        <div class="sub">Painel da campanha &nbsp;|&nbsp; <span id="nomeCampanha">Campanha de Captação</span></div>
-      </div>
-      <div class="topo-dir">
-        <div class="info periodo-topo">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7.5 13.5h.01M12 13.5h.01M16.5 13.5h.01M7.5 17h.01M12 17h.01"/></svg>
-          <div><div class="rot">Período da campanha</div><div class="val"><span id="dtIni">—</span> a <span id="dtFim">—</span></div></div>
-        </div>
-        <span class="sep-v hide-md"></span>
-        <div class="info">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 7.5V12l3 2"/></svg>
-          <div><div class="rot">Atualizado em</div><div class="val status" id="status" data-s="off"><span class="dot"></span><span id="statusTxt">—</span></div></div>
-        </div>
+      <span class="nav-sep"></span>
+      <span class="nav-title">Ranking de Captação</span>
+      <div class="nav-actions">
+        <span class="status" id="status" data-s="off"><span class="dot"></span><span id="statusTxt">—</span></span>
         <button class="btn-remax" id="btnAtualizar" title="Buscar os dados mais recentes da planilha"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>Atualizar</button>
-        <button class="btn-quad" id="btnTela" title="Tela cheia (apresentação)" aria-label="Tela cheia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        <button class="btn-square" id="btnTela" title="Tela cheia (modo TV)" aria-label="Tela cheia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <!-- indicadores principais -->
-    <section class="secao kpis">
-      <div class="card kpi">
-        <div class="kpi-h"><span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></span><span class="rot">Imóveis<br>captados</span></div>
-        <div class="val" id="kQtd">0</div>
-        <div class="det" id="kQtdD"></div>
-        <div class="barra hidden" id="kMetaTrk"><i id="kMetaBar"></i></div>
+  <!-- hero -->
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <p class="hero-pre">Campanha de captação de imóveis</p>
+        <h1 id="nomeCampanha">Campanha de Captação</h1>
+        <p class="hero-sub">Cada imóvel captado soma pontos: quanto maior o valor, maior a pontuação. Quem estiver em 1º lugar ao final da campanha leva o prêmio.</p>
       </div>
-      <div class="card kpi">
-        <div class="kpi-h"><span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/><path d="M16 14.5h2.5"/></svg></span><span class="rot">Valor total<br>captado</span></div>
-        <div class="val" id="kValor">R$ 0</div>
-        <div class="det" id="kValorD"></div>
-      </div>
-      <div class="card kpi">
-        <div class="kpi-h"><span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></span><span class="rot">Pontos<br>distribuídos</span></div>
-        <div class="val" id="kPts">0</div>
-        <div class="det" id="kPtsD"></div>
-      </div>
-      <div class="card kpi verde">
-        <div class="kpi-h"><span class="ico verde"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></span><span class="rot" id="lblPremio">Prêmio para<br>o 1º lugar</span></div>
-        <div class="val txt" id="txtPremio">—</div>
-        <div class="det" id="txtLider"></div>
-      </div>
-    </section>
-
-    <!-- indicadores secundários -->
-    <section class="secao kpis-p">
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p vermelho"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span><span class="rot">Captações<br>de venda</span></div>
-        <div class="val" id="kVenda">0</div><div class="det" id="kVendaD"></div><div class="barra vermelha"><i id="kVendaBar" style="width:0"></i></div>
-      </div>
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="m11.5 11.5 8-8M16.5 6.5l2 2M14.5 8.5l2 2"/></svg></span><span class="rot">Captações<br>de locação</span></div>
-        <div class="val" id="kLoc">0</div><div class="det" id="kLocD"></div><div class="barra"><i id="kLocBar" style="width:0"></i></div>
-      </div>
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg></span><span class="rot">Cancela-<br>mentos</span></div>
-        <div class="val" id="kCanc">0</div><div class="det" id="kCancD"></div><div class="barra vermelha"><i id="kCancBar" style="width:0"></i></div>
-      </div>
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></svg></span><span class="rot">Corretores<br>pontuando</span></div>
-        <div class="val" id="kCor">0</div><div class="det" id="kCorD"></div><div class="barra"><i id="kCorBar" style="width:0"></i></div>
-      </div>
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 7.5V12l3 2"/></svg></span><span class="rot">Últimos<br>7 dias</span></div>
-        <div class="val" id="kSemana">0</div><div class="det" id="kSemanaD"></div><div class="barra"><i id="kSemanaBar" style="width:0"></i></div>
-      </div>
-      <div class="card kpi-p">
-        <div class="kpi-h"><span class="ico p"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="rot">Média por<br>corretor</span></div>
-        <div class="val" id="kMedia">0</div><div class="det" id="kMediaD"></div><div class="barra verde"><i id="kMediaBar" style="width:0"></i></div>
-      </div>
-    </section>
-
-    <!-- linha do tempo: etapa atual com o balão animado -->
-    <section class="secao card linha-tempo">
-      <div class="sec-h">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-        <h2>Etapas da campanha</h2>
-        <span class="dir" id="etapaAtualTxt"></span>
-      </div>
-      <div class="trilho-area" id="trkPeriodo" role="progressbar" aria-label="Andamento da campanha" aria-valuemin="0" aria-valuemax="100">
-        <div class="trilho"><i id="barPeriodo"></i></div>
-        <div id="etapas"></div>
-        <div class="balao" id="balao" aria-hidden="true">
-          <span class="hoje">HOJE</span>
-          <svg viewBox="0 0 64 84"><defs><clipPath id="env"><path d="M32 2C16 2 4 13.5 4 28c0 13 10.5 23 20 31h16c9.5-8 20-18 20-31C60 13.5 48 2 32 2z"/></clipPath></defs>
-            <g clip-path="url(#env)"><rect x="0" y="0" width="64" height="24" fill="#e3262f"/><rect x="0" y="24" width="64" height="13" fill="#ffffff"/><rect x="0" y="37" width="64" height="30" fill="#1d4ed8"/><path d="M32 2v60" stroke="rgba(0,0,0,.12)" stroke-width="1.5"/><path d="M18 6c-5 10-5 32 6 53M46 6c5 10 5 32-6 53" stroke="rgba(0,0,0,.12)" stroke-width="1.5" fill="none"/></g>
-            <path d="M32 2C16 2 4 13.5 4 28c0 13 10.5 23 20 31h16c9.5-8 20-18 20-31C60 13.5 48 2 32 2z" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/>
-            <path d="M25 59l2 13M39 59l-2 13" stroke="#cbd5e1" stroke-width="1.5"/><rect x="25" y="71" width="14" height="10" rx="2" fill="#a16207"/><rect x="25" y="71" width="14" height="3" rx="1" fill="#ca8a04"/></svg>
-          <span class="sombra-balao"></span>
+      <div class="premio-card">
+        <div class="trofeu"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></div>
+        <div style="min-width:0">
+          <div class="lbl" id="lblPremio">Prêmio para o 1º lugar</div>
+          <div class="txt" id="txtPremio">—</div>
+          <div class="lider" id="txtLider"></div>
         </div>
       </div>
-      <div class="linha-legenda"><span id="txtDia">—</span><span id="txtResta">—</span></div>
-    </section>
+    </div>
+  </section>
 
-    <!-- pódio -->
-    <section class="secao card">
-      <div class="sec-h">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
-        <h2 id="tituloPodio">Pódio atual</h2>
-        <span class="dir" id="subPodio"></span>
+  <!-- período -->
+  <div class="wrap periodo">
+    <div class="tabs">
+      <span class="tab on">Início <b id="dtIni">—</b></span>
+      <span class="tab">Término <b id="dtFim">—</b></span>
+      <span class="tab" id="txtResta">—</span>
+    </div>
+    <div class="periodo-box">
+      <div class="field"><span>Período da campanha</span><span id="txtDia">—</span></div>
+      <div class="track" role="progressbar" aria-label="Andamento da campanha" aria-valuemin="0" aria-valuemax="100" id="trkPeriodo"><i id="barPeriodo" style="width:0"></i></div>
+    </div>
+  </div>
+
+  <!-- pódio -->
+  <section class="band band-b" style="padding-top:52px">
+    <div class="slashes" style="left:3%;bottom:30px"><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Destaques da campanha</p>
+        <h2 class="sec-title" id="tituloPodio">Pódio atual</h2>
+        <div class="accent"></div>
+        <p class="sec-desc" id="subPodio"></p>
       </div>
       <div class="podio" id="podio"></div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ranking -->
-    <section class="secao card">
-      <div class="sec-h">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
-        <h2>Ranking geral</h2>
-        <span class="dir">Ordenado por pontuação · coluna "7 dias" = variação de posição na semana</span>
+  <!-- indicadores -->
+  <section class="band band-a">
+    <div class="wrap">
+      <div class="intro">
+        <p class="intro-it">Como está a campanha?</p>
+        <h2 class="intro-h">Os números da campanha até agora</h2>
+        <div class="accent center"></div>
       </div>
-      <div class="tbl-wrap">
-        <table class="rank">
-          <thead><tr><th style="width:56px">#</th><th>Corretor</th><th class="n">Pontos</th><th class="n">Imóveis</th><th class="n">Valor captado</th><th class="n hide-sm">Venda / Locação</th><th class="n hide-sm">7 dias</th></tr></thead>
-          <tbody id="tbRanking"></tbody>
-        </table>
+      <div class="pins">
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Imóveis</span><span class="pv" id="kQtd">0</span><span class="pl">captados</span></div></div></div>
+          <div class="pin-sub" id="kQtdD"></div>
+          <div class="meta-trk hidden" id="kMetaTrk"><i id="kMetaBar"></i></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Valor total</span><span class="pv sm" id="kValor">R$ 0</span><span class="pl">captado</span></div></div></div>
+          <div class="pin-sub" id="kValorD"></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Pontos</span><span class="pv" id="kPts">0</span><span class="pl">distribuídos</span></div></div></div>
+          <div class="pin-sub" id="kPtsD"></div>
+        </div>
+        <div class="pin-wrap">
+          <div class="pin-area"><div class="pin-ghost"></div><div class="pin"><div class="pin-c"><span class="pl">Corretores</span><span class="pv" id="kCor">0</span><span class="pl">pontuando</span></div></div></div>
+          <div class="pin-sub" id="kCorD"></div>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- evolução + últimas captações -->
-    <section class="secao grid2">
+  <!-- ranking -->
+  <section class="band band-b">
+    <div class="wrap">
       <div class="card">
-        <div class="sec-h">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
-          <h2>Evolução da pontuação</h2>
-          <span class="dir">Pontos acumulados por corretor · clique no nome para mostrar/ocultar</span>
+        <div class="sec-head">
+          <p class="eyebrow">Classificação completa</p>
+          <h2 class="sec-title">Ranking geral</h2>
+          <div class="accent"></div>
+          <p class="sec-desc">Ordenado por pontuação · coluna "7 dias" mostra quantas posições cada corretor subiu ou caiu na última semana.</p>
+        </div>
+        <div class="tbl-wrap">
+          <table class="rank">
+            <thead><tr>
+              <th style="width:48px">#</th><th>Corretor</th><th class="n">Pontos</th><th class="n">Imóveis</th><th class="n">Valor captado</th><th class="n hide-sm">Ticket médio</th><th class="n hide-sm">7 dias</th>
+            </tr></thead>
+            <tbody id="tbRanking"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- evolução + últimas captações -->
+  <section class="band band-a">
+    <div class="wrap grid2">
+      <div class="card">
+        <div class="sec-head">
+          <p class="eyebrow">Desempenho ao longo da campanha</p>
+          <h2 class="sec-title">Evolução da pontuação</h2>
+          <div class="accent"></div>
+          <p class="sec-desc">Pontos acumulados por corretor, dia a dia. Clique no nome de um corretor para mostrar ou ocultar a linha.</p>
         </div>
         <div class="chart-box"><canvas id="grafico" role="img" aria-label="Gráfico de evolução da pontuação acumulada por corretor"></canvas></div>
         <div class="legend" id="legenda"></div>
       </div>
       <div class="card">
-        <div class="sec-h">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
-          <h2>Últimas captações</h2>
+        <div class="sec-head">
+          <p class="eyebrow">Fique por dentro</p>
+          <h2 class="sec-title">Últimas captações</h2>
+          <div class="accent"></div>
         </div>
         <ul class="feed" id="feed"></ul>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- regras de pontuação -->
-    <section class="secao card">
-      <div class="sec-h">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h10v16H5V8z"/><path d="M9 4v4H5"/><path d="M9 13h6M9 17h4"/></svg>
-        <h2>Tabela de pontos</h2>
-        <span class="dir">Conforme a aba "Pontuação" da planilha</span>
+  <!-- regras -->
+  <section class="band band-b">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Como pontuar</p>
+        <h2 class="sec-title">Regras de pontuação</h2>
+        <div class="accent"></div>
+        <p class="sec-desc">Pontos de cada tipo de captação, conforme a aba "Pontuação" da planilha. Cancelamentos descontam pontos.</p>
       </div>
       <div class="regras" id="tbRegras"></div>
       <p class="nota" id="notaDesempate"></p>
-    </section>
+    </div>
+  </section>
 
-    <footer class="card rodape">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-      <span>Valores em reais (R$) &nbsp;|&nbsp; <span id="rodape"></span></span>
+  <footer class="foot">
+    <div class="foot-in">
       <span class="marca"><img class="logo" src="logo-remax.png" alt="RE/MAX" onerror="this.outerHTML='<span class=&quot;logo-txt&quot;>RE/MAX</span>'"><span class="marca-sub">DOMINUS</span></span>
-    </footer>
-  </main>
+      <div class="foot-txt" id="rodape"></div>
+    </div>
+    <div class="foot-bar">Painel interno da campanha de captação · dados lidos diretamente da planilha da campanha</div>
+  </footer>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
@@ -552,8 +539,6 @@ const fmtData = d => d ? d.toLocaleDateString('pt-BR') : '—';
 const fmtDiaMes = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 const hoje0 = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
 const diasEntre = (a, b) => Math.round((b - a) / DIA);
-const somaDias = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
 const iniciais = n => n.split(' ').filter(Boolean).filter((p, i, a) => i === 0 || i === a.length - 1).map(p => p[0]).join('').toUpperCase();
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
@@ -580,8 +565,6 @@ function toDate(v) {
   if (m) return new Date(+m[1], m[2] - 1, +m[3]);
   return null;
 }
-// "Venda", "Locação - Parceria" etc. → 'venda' | 'locacao' | ''
-const tipoDe = s => { const t = norm(s); return /loca|alug/.test(t) ? 'locacao' : /vend|represent/.test(t) ? 'venda' : ''; };
 
 /* ===================== leitura da planilha ===================== */
 function linhas(ws) { return XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false }); }
@@ -647,7 +630,7 @@ function lerPlanilha(buf) {
   const h = L.findIndex(r => r && r.some(c => /corretor/.test(norm(c))));
   if (h < 0) throw new Error(`Não encontrei a coluna "Corretor" na aba "${nCapt}".`);
   const cab = L[h].map(norm), usadas = new Set(), col = {};
-  for (const [k, re] of [['valor', /valor/], ['data', /data/], ['pontos', /pontu|ponto/], ['corretor', /corretor/], ['tipo', /venda|locacao|modalidade|negocio|tipo/], ['imovel', /imovel|endereco|descri|codigo|referencia/]]) {
+  for (const [k, re] of [['valor', /valor/], ['data', /data/], ['pontos', /pontu|ponto/], ['corretor', /corretor/], ['imovel', /imovel|endereco|descri|codigo|referencia/]]) {
     const i = cab.findIndex((c, j) => !usadas.has(j) && re.test(c));
     if (i >= 0) { col[k] = i; usadas.add(i); }
   }
@@ -658,16 +641,12 @@ function lerPlanilha(buf) {
   for (const r of L.slice(h + 1)) {
     if (!r || r.every(c => c == null || c === '')) continue;
     const corretor = String(r[col.corretor] ?? '').replace(/\s+/g, ' ').trim();
-    let valor = toNum(r[col.valor]);
+    const valor = toNum(r[col.valor]);
     const data = toDate(r[col.data]);
+    if (!corretor || !(valor > 0) || !data) { incompletas++; continue; }
     let pontos = col.pontos != null ? toNum(r[col.pontos]) : NaN;
-    // sem valor do imóvel só vale se a pontuação estiver preenchida (ex.: cancelamento −50)
-    if (!corretor || !data || (!(valor > 0) && !isFinite(pontos))) { incompletas++; continue; }
-    if (!(valor > 0)) valor = 0;
     if (!isFinite(pontos)) pontos = pontosPorValor(valor, faixas);
-    const tipoTxt = col.tipo != null && r[col.tipo] != null ? String(r[col.tipo]).replace(/\s+/g, ' ').trim() : '';
-    const imovel = col.imovel != null && r[col.imovel] != null ? String(r[col.imovel]).trim() : '';
-    registros.push({ corretor, chave: norm(corretor), imovel, tipoTxt, tipo: tipoDe(tipoTxt || imovel), valor, data, pontos });
+    registros.push({ corretor, chave: norm(corretor), imovel: col.imovel != null && r[col.imovel] != null ? String(r[col.imovel]).trim() : '', valor, data, pontos });
   }
   return { campanha, faixas, registros, incompletas };
 }
@@ -677,9 +656,8 @@ function ranking(regs) {
   const m = new Map();
   for (const r of regs) {
     let c = m.get(r.chave);
-    if (!c) { c = { chave: r.chave, nome: r.corretor, pontos: 0, qtd: 0, valor: 0, venda: 0, locacao: 0, ultima: null }; m.set(r.chave, c); }
+    if (!c) { c = { chave: r.chave, nome: r.corretor, pontos: 0, qtd: 0, valor: 0, ultima: null }; m.set(r.chave, c); }
     c.pontos += r.pontos; c.qtd++; c.valor += r.valor;
-    if (r.tipo === 'venda') c.venda++; else if (r.tipo === 'locacao') c.locacao++;
     if (!c.ultima || r.data > c.ultima) c.ultima = r.data;
   }
   return [...m.values()].sort((a, b) => b.pontos - a.pontos || b.valor - a.valor || b.qtd - a.qtd || a.nome.localeCompare(b.nome, 'pt-BR'))
@@ -741,44 +719,6 @@ const avatar = c => {
 const ICO_CASA = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>';
 const ICO_VALOR = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg>';
 const ICO_TROFEU = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg>';
-const ICO_ETAPA = [
-  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M9 12a12 12 0 0 1 11-9 12 12 0 0 1-9 11"/><path d="m9 12 3 3"/></svg>',
-  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
-  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
-  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg>'
-];
-const ICO_FEITA = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>';
-
-/* Etapas: Lançamento → Em andamento → Reta final → Premiação.
-   Os pontos ficam igualmente espaçados; o balão anda proporcionalmente dentro da etapa em que hoje está. */
-function renderEtapas(camp, hoje) {
-  const alvo = $('etapas');
-  if (!camp.inicio || !camp.fim) { alvo.innerHTML = ''; $('balao').classList.add('hidden'); return; }
-  const T = diasEntre(camp.inicio, camp.fim) + 1;
-  const L = Math.max(1, Math.min(7, Math.round(T * 0.15)));      // 1ª semana = lançamento
-  const R = Math.max(1, Math.min(15, Math.round(T * 0.2)));      // reta final = últimos ~20% (até 15 dias)
-  const marcos = [camp.inicio, somaDias(camp.inicio, L), somaDias(camp.fim, -(R - 1)), camp.fim];
-  if (marcos[2] <= marcos[1]) marcos[2] = somaDias(marcos[1], 1);
-  const nomes = ['Lançamento', 'Em andamento', 'Reta final', 'Premiação'];
-  const quando = [fmtDiaMes(marcos[0]), 'a partir de ' + fmtDiaMes(marcos[1]), 'a partir de ' + fmtDiaMes(marcos[2]), hoje > camp.fim ? 'campanha encerrada' : 'após ' + fmtDiaMes(marcos[3])];
-  let atual, posicao;
-  if (hoje < marcos[0]) { atual = -1; posicao = 0; }
-  else if (hoje > marcos[3]) { atual = 3; posicao = 100; }
-  else {
-    atual = hoje >= marcos[2] ? 2 : hoje >= marcos[1] ? 1 : 0;
-    const a = marcos[atual], b = atual === 2 ? somaDias(marcos[3], 1) : marcos[atual + 1];
-    posicao = (atual + Math.min(1, diasEntre(a, hoje) / Math.max(1, diasEntre(a, b)))) / 3 * 100;
-  }
-  alvo.innerHTML = nomes.map((n, i) => {
-    const cls = i < atual ? 'feita' : i === atual ? 'atual' : '';
-    return `<div class="etapa ${cls}" style="--i:${i}"><span class="no">${i < atual ? ICO_FEITA : ICO_ETAPA[i]}</span><span class="nome">${n}</span><span class="quando">${quando[i]}</span></div>`;
-  }).join('');
-  // a posição de hoje vai numa variável CSS: horizontal no computador, vertical no celular
-  $('trkPeriodo').style.setProperty('--pos', posicao + '%');
-  $('balao').classList.remove('hidden');
-  $('trkPeriodo').setAttribute('aria-valuenow', Math.round(posicao));
-  $('etapaAtualTxt').innerHTML = atual < 0 ? `A campanha começa em <b>${fmtData(camp.inicio)}</b>` : `Etapa atual: <b>${nomes[atual]}</b>`;
-}
 
 function render(dados) {
   const E = estado = calcular(dados);
@@ -789,7 +729,7 @@ function render(dados) {
   // cabeçalho + período
   const nome = camp.nome || 'Campanha de Captação';
   $('nomeCampanha').textContent = nome;
-  document.title = 'RE/MAX Dominus · ' + nome;
+  document.title = 'RE/MAX · ' + nome;
   $('dtIni').textContent = fmtData(camp.inicio);
   $('dtFim').textContent = fmtData(camp.fim);
   const total = camp.inicio && camp.fim ? diasEntre(camp.inicio, camp.fim) + 1 : 0;
@@ -797,34 +737,33 @@ function render(dados) {
   const naoComecou = camp.inicio && hoje < camp.inicio;
   let dia = camp.inicio ? diasEntre(camp.inicio, hoje) + 1 : 0;
   dia = Math.max(0, Math.min(dia, total));
-  renderEtapas(camp, hoje);
+  $('barPeriodo').style.width = (total ? dia / total * 100 : 0) + '%';
+  $('trkPeriodo').setAttribute('aria-valuenow', Math.round(total ? dia / total * 100 : 0));
   if (naoComecou) {
     $('txtDia').innerHTML = `Começa em <b>${diasEntre(hoje, camp.inicio)} dia(s)</b>`;
     $('txtResta').innerHTML = `<b>${total}</b> dias de duração`;
   } else if (encerrada) {
-    $('txtDia').innerHTML = `<b>Campanha encerrada</b> em ${fmtData(camp.fim)}`;
+    $('txtDia').innerHTML = `<b>Campanha encerrada</b>`;
     $('txtResta').innerHTML = `<b>${total}</b> dias de duração`;
   } else {
     const resta = total - dia;
-    $('txtDia').innerHTML = `Dia <b>${dia}</b> de <b>${total}</b> · <b>${fmtInt(total ? dia / total * 100 : 0)}%</b> do período concluído`;
-    $('txtResta').innerHTML = resta === 0 ? '<b>Último dia!</b>' : `Faltam <b>${resta}</b> dia${resta > 1 ? 's' : ''} para o encerramento`;
+    $('txtDia').innerHTML = `Dia <b>${dia}</b> de <b>${total}</b> · <b>${fmtInt(total ? dia / total * 100 : 0)}%</b> concluído`;
+    $('txtResta').innerHTML = resta === 0 ? '<b>Último dia!</b>' : `Faltam <b>${resta}</b> dia${resta > 1 ? 's' : ''}`;
   }
 
-  // prêmio / liderança
+  // prêmio
   const lider = rank[0];
   const lideres = rank.filter(c => c.pos === 1);
   const nomesLideres = lideres.map(c => `<b>${esc(c.nome)}</b>`).join(lideres.length > 2 ? ', ' : ' e ').replace(/, (?=[^,]*$)/, ' e ');
-  $('lblPremio').innerHTML = encerrada ? 'Prêmio do<br>vencedor' : 'Prêmio para<br>o 1º lugar';
-  $('txtPremio').textContent = camp.premio || 'Defina o prêmio na aba "Campanha"';
+  $('lblPremio').textContent = encerrada ? 'Prêmio do vencedor' : 'Prêmio para o 1º lugar';
+  $('txtPremio').textContent = camp.premio || 'Defina o prêmio na aba "Campanha" da planilha';
   $('txtLider').innerHTML = !lider ? 'Ainda sem captações'
     : lideres.length > 1
-      ? (encerrada ? `Empate em 1º lugar: ${nomesLideres} · ${fmtPts(lider.pontos)} pts` : `Empate na liderança: ${nomesLideres} · ${fmtPts(lider.pontos)} pts`)
-      : (encerrada ? `Vencedor: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts` : `Liderando: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts`);
+      ? (encerrada ? `Empate em 1º lugar: ${nomesLideres} com ${fmtPts(lider.pontos)} pontos` : `Empate na liderança: ${nomesLideres} · ${fmtPts(lider.pontos)} pts`)
+      : (encerrada ? `Vencedor: <b>${esc(lider.nome)}</b> com ${fmtPts(lider.pontos)} pontos` : `Liderando agora: <b>${esc(lider.nome)}</b> · ${fmtPts(lider.pontos)} pts`);
 
-  // indicadores principais
+  // indicadores
   const qtd = regs.length, valor = regs.reduce((s, r) => s + r.valor, 0), pts = regs.reduce((s, r) => s + r.pontos, 0);
-  const vendas = regs.filter(r => r.tipo === 'venda'), locs = regs.filter(r => r.tipo === 'locacao');
-  const temTipo = vendas.length + locs.length > 0;
   $('kQtd').textContent = fmtInt(qtd);
   if (camp.meta) {
     const p = Math.min(100, qtd / camp.meta * 100);
@@ -836,24 +775,12 @@ function render(dados) {
   }
   $('kValor').textContent = fmtBRLc(valor);
   $('kValor').title = fmtBRL(valor);
-  $('kValorD').innerHTML = !qtd ? '' : temTipo
-    ? `Venda <b>${fmtBRLc(vendas.reduce((s, r) => s + r.valor, 0))}</b> · Locação <b>${fmtBRLc(locs.reduce((s, r) => s + r.valor, 0))}</b>`
-    : `ticket médio de ${fmtBRLc(valor / qtd)}`;
+  $('kValorD').textContent = qtd ? `ticket médio de ${fmtBRLc(valor / qtd)}` : '';
   $('kPts').textContent = fmtPts(pts);
-  $('kPtsD').textContent = qtd ? `média de ${fmtPts(pts / qtd)} pts por captação` : '';
-
-  // indicadores secundários
-  const canc = regs.filter(r => r.pontos < 0);
-  const semanaRegs = regs.filter(r => r.data > new Date(hoje - 7 * DIA));
-  const semanaCor = new Set(semanaRegs.map(r => r.chave)).size;
-  const barra = (id, p) => { $(id).style.width = Math.max(0, Math.min(100, p)) + '%'; };
-  $('kVenda').textContent = fmtInt(vendas.length); $('kVendaD').textContent = temTipo ? `${pct(vendas.length, qtd)}% das captações` : 'tipo não informado'; barra('kVendaBar', pct(vendas.length, qtd));
-  $('kLoc').textContent = fmtInt(locs.length); $('kLocD').textContent = temTipo ? `${pct(locs.length, qtd)}% das captações` : 'tipo não informado'; barra('kLocBar', pct(locs.length, qtd));
-  $('kCanc').textContent = fmtInt(canc.length); $('kCancD').textContent = canc.length ? `${fmtPts(canc.reduce((s, r) => s + r.pontos, 0))} pts descontados` : 'nenhum no período'; barra('kCancBar', pct(canc.length, qtd));
-  $('kCor').textContent = fmtInt(rank.length); $('kCorD').textContent = encerrada ? 'com ao menos 1 captação' : `${semanaCor} ativos na semana`; barra('kCorBar', pct(semanaCor, rank.length));
-  $('kSemana').textContent = fmtInt(semanaRegs.length); $('kSemanaD').textContent = `${pct(semanaRegs.length, qtd)}% do total captado`; barra('kSemanaBar', pct(semanaRegs.length, qtd));
-  const media = rank.length ? pts / rank.length : 0;
-  $('kMedia').textContent = fmtPts(Math.round(media)); $('kMediaD').textContent = lider ? `pts · líder com ${fmtPts(lider.pontos)}` : 'pts por corretor'; barra('kMediaBar', lider && lider.pontos > 0 ? media / lider.pontos * 100 : 0);
+  $('kPtsD').textContent = qtd ? `média de ${fmtPts(pts / qtd)} pts por imóvel` : '';
+  $('kCor').textContent = fmtInt(rank.length);
+  const semana = new Set(regs.filter(r => r.data > new Date(hoje - 7 * DIA)).map(r => r.chave)).size;
+  $('kCorD').textContent = encerrada ? 'com ao menos 1 captação' : `${semana} captaram nos últimos 7 dias`;
 
   renderPodio(E, encerrada);
   renderRanking(E);
@@ -865,11 +792,11 @@ function render(dados) {
 function renderPodio(E, encerrada) {
   const r = E.rank;
   $('tituloPodio').textContent = encerrada ? 'Resultado final' : 'Pódio atual';
-  $('subPodio').textContent = r.length ? `Os três corretores com mais pontos entre ${r.length} participantes` : '';
+  $('subPodio').textContent = r.length ? `Os três corretores com mais pontos entre os ${r.length} participantes do ranking.` : '';
   const cls = { 1: 'red', 2: 'blue', 3: '' };
   const card = (c, i) => {
     const pos = c ? c.pos : i + 1;   // empatados mostram a mesma posição
-    const tag = `<span class="tag ${cls[pos] ?? ''}">${pos === 1 ? ICO_TROFEU : ''}${pos}º lugar</span>`;
+    const tag = `<span class="tag pill ${cls[pos] ?? ''}">${pos === 1 ? ICO_TROFEU : ''}${pos}º lugar</span>`;
     if (!c) return `<article class="pcard p${i + 1} vazio"><div class="pcard-top">${tag}</div><div class="pcard-body">Posição em aberto</div></article>`;
     const empatados = r.filter(o => o !== c && o.pos === c.pos);
     const acima = r.filter(o => o.pos < c.pos).pop();     // colocado imediatamente acima
@@ -882,7 +809,7 @@ function renderPodio(E, encerrada) {
       <div class="pcard-top">${tag}${avatar(c)}</div>
       <div class="pcard-body">
         <div class="pval">${fmtPts(c.pontos)}<small>pontos</small></div>
-        <div class="picons"><span>${ICO_CASA}${c.qtd} captaç${c.qtd === 1 ? 'ão' : 'ões'}</span><span>${ICO_VALOR}${fmtBRLc(c.valor)}</span></div>
+        <div class="picons"><span>${ICO_CASA}${c.qtd} imóve${c.qtd === 1 ? 'l' : 'is'}</span><span>${ICO_VALOR}${fmtBRLc(c.valor)}</span></div>
         <div class="pname">${esc(c.nome)}</div>
         <div class="pgap">${gap}</div>
       </div>
@@ -892,7 +819,7 @@ function renderPodio(E, encerrada) {
 }
 
 function renderRanking(E) {
-  const max = Math.max(1, ...E.rank.map(c => c.pontos));
+  const max = E.rank[0]?.pontos || 1;
   $('tbRanking').innerHTML = E.rank.map(c => {
     let mov;
     if (c.posAntes == null) mov = `<span class="mov new">novo</span>`;
@@ -900,12 +827,12 @@ function renderRanking(E) {
     else if (c.posAntes < c.pos) mov = `<span class="mov down" title="Caiu ${c.pos - c.posAntes} posição(ões)">▼ ${c.pos - c.posAntes}</span>`;
     else mov = `<span class="mov eq" title="Mesma posição">=</span>`;
     return `<tr class="${c.pos <= 3 ? 'r' + c.pos : ''}">
-      <td><span class="pos">${c.pos}º</span></td>
+      <td><span class="pos">${c.pos}</span></td>
       <td><div class="who">${avatar(c)}<b>${esc(c.nome)}</b></div></td>
       <td class="n"><div class="ptsbar"><span class="bar" aria-hidden="true"><i style="width:${Math.max(2, c.pontos / max * 100)}%"></i></span><b>${fmtPts(c.pontos)}</b></div></td>
       <td class="n">${c.qtd}</td>
       <td class="n" title="${fmtBRL(c.valor)}">${fmtBRLc(c.valor)}</td>
-      <td class="n hide-sm">${c.venda} / ${c.locacao}</td>
+      <td class="n hide-sm">${fmtBRLc(c.valor / c.qtd)}</td>
       <td class="n hide-sm">${mov}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--muted)">Nenhuma captação no período da campanha.</td></tr>`;
@@ -916,17 +843,12 @@ function renderFeed(E) {
   const ult = E.regs.map((r, i) => ({ r, i })).sort((a, b) => b.r.data - a.r.data || b.i - a.i).slice(0, 6);
   $('feed').innerHTML = ult.map(({ r }) => {
     const c = porChave.get(r.chave);
-    const chip = r.tipo ? `<span class="chip ${r.tipo}">${r.tipo === 'venda' ? 'Venda' : 'Locação'}</span>` : '';
-    // "Locação - Parceria" → etiqueta LOCAÇÃO + "Parceria"; só "Venda" → etiqueta VENDA + "Nova captação"
-    const resto = r.tipo ? r.tipoTxt.replace(/^\s*(venda|loca[cç][aã]o|aluguel)\s*[-–:]?\s*/i, '') : r.tipoTxt;
-    const desc = r.imovel || resto || 'Nova captação';
-    const val = r.tipo === 'locacao' ? fmtBRL(r.valor) : fmtBRLc(r.valor);
-    return `<li>${avatar(c)}<div class="t"><div class="dt">${fmtData(r.data)}</div><div class="im">${chip}${esc(desc)}</div><div class="by">${esc(r.corretor)} · ${val}</div></div><span class="pts ${r.pontos < 0 ? 'neg' : ''}">${r.pontos > 0 ? '+' : r.pontos < 0 ? '−' : ''}${fmtPts(Math.abs(r.pontos))} pts</span></li>`;
+    return `<li>${avatar(c)}<div class="t"><div class="dt">${fmtData(r.data)}</div><div class="im">${esc(r.imovel || 'Imóvel captado')}</div><div class="by">${esc(r.corretor)} · ${fmtBRLc(r.valor)}</div></div><span class="tag pill">+${fmtPts(r.pontos)} pts</span></li>`;
   }).join('') || `<li style="color:var(--muted)">Nenhuma captação ainda.</li>`;
 }
 
 function renderRegras(E) {
-  // Agrupa pelo prefixo do texto ("VENDA - ...", "LOCAÇÃO - ..."); cada grupo vira um bloco no estilo da arte do Desafio
+  // Agrupa pelo prefixo do texto ("VENDA - ...", "LOCAÇÃO - ..."); sem prefixo, lista simples
   const grupos = new Map();
   for (const f of E.faixas) {
     const m = String(f.faixa).match(/^([^\-–]{2,30}?)\s+[-–]\s+(.+)$/);
@@ -934,19 +856,10 @@ function renderRegras(E) {
     if (!grupos.has(g)) grupos.set(g, []);
     grupos.get(g).push({ txt: m ? m[2].trim() : f.faixa, pontos: f.pontos });
   }
-  const ICO_BLOCO = {
-    venda: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>',
-    locacao: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="m11.5 11.5 8-8M16.5 6.5l2 2M14.5 8.5l2 2"/></svg>',
-    '': '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>'
-  };
-  const pts = p => `<span class="pt ${p < 0 ? 'neg' : ''}">${p > 0 ? '+ ' : p < 0 ? '− ' : ''}${fmtPts(Math.abs(p))}<small>pontos</small></span>`;
-  $('tbRegras').innerHTML = [...grupos].map(([g, itens]) => {
-    const t = tipoDe(g);
-    const titulo = t === 'venda' ? 'Captação de representação' : t === 'locacao' ? 'Captação de locação' : (g || 'Pontuação');
-    const sub = t === 'venda' ? '<div class="tipo">VENDA</div>' : '';
-    return `<div class="bloco ${t}"><div class="bloco-h"><span class="circ">${ICO_BLOCO[t]}</span><div><h3>${esc(titulo)}</h3>${sub}</div></div>
-      <table><thead><tr><th>Ação</th><th>Pontos</th></tr></thead><tbody>${itens.map(i => `<tr><td>${esc(i.txt)}</td><td>${pts(i.pontos)}</td></tr>`).join('')}</tbody></table></div>`;
-  }).join('');
+  const sinal = p => (p > 0 ? '+' : p < 0 ? '−' : '') + fmtPts(Math.abs(p));
+  const item = i => `<div class="regra"><span class="fx">${esc(i.txt)}</span><span class="tag pill ${i.pontos < 0 ? 'neg' : 'red'}">${sinal(i.pontos)} pontos</span></div>`;
+  $('tbRegras').innerHTML = [...grupos].map(([g, itens]) =>
+    `<div class="regra-grupo">${g ? `<h3 class="regra-tit">${esc(g)}</h3>` : ''}<div class="regras-lista">${itens.map(item).join('')}</div></div>`).join('');
   $('notaDesempate').innerHTML = '<b>Pontuações iguais ficam na mesma posição do ranking.</b> Critério de desempate para definir quem leva o prêmio: ' + esc(E.camp.desempate || 'maior valor total captado; persistindo, maior número de imóveis.');
 }
 
@@ -956,7 +869,7 @@ const crosshair = {
     const a = chart.tooltip && chart.tooltip.getActiveElements();
     if (!a || !a.length) return;
     const x = a[0].element.x, { top, bottom } = chart.chartArea, ctx = chart.ctx;
-    ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1;
+    ctx.save(); ctx.strokeStyle = '#9aa3b2'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
   }
 };
@@ -981,8 +894,8 @@ function renderGrafico(E) {
       label: c.nome, chave: c.chave,
       data: porDia.get(c.chave).map(v => (acc += v)),
       borderColor: cor, backgroundColor: cor,
-      borderWidth: c.cor === '--s-muted' ? 1.5 : 2.2,
-      pointRadius: 0, pointHoverRadius: 5, pointHoverBorderWidth: 2, pointHoverBorderColor: '#0a1d48',
+      borderWidth: c.cor === '--s-muted' ? 1.5 : 2,
+      pointRadius: 0, pointHoverRadius: 5, pointHoverBorderWidth: 2, pointHoverBorderColor: '#fff',
       tension: 0, hidden: ocultos.has(c.chave)
     };
   });
@@ -992,7 +905,7 @@ function renderGrafico(E) {
     grafico.update('none');
   } else {
     Chart.defaults.font.family = '"Noto Sans", system-ui, sans-serif';
-    Chart.defaults.color = '#b9c9ec';
+    Chart.defaults.color = '#485c77';
     grafico = new Chart($('grafico'), {
       type: 'line',
       data: { labels, datasets },
@@ -1004,7 +917,7 @@ function renderGrafico(E) {
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#020a22', borderColor: 'rgba(96,150,255,.55)', borderWidth: 1, titleColor: '#fff', bodyColor: '#fff',
+            backgroundColor: '#000e35', titleColor: '#fff', bodyColor: '#fff',
             titleFont: { weight: '700' }, bodyFont: { weight: '400' },
             cornerRadius: 8, padding: 12, boxPadding: 4, usePointStyle: true,
             itemSort: (a, b) => b.parsed.y - a.parsed.y,
@@ -1012,8 +925,8 @@ function renderGrafico(E) {
           }
         },
         scales: {
-          x: { grid: { color: 'rgba(255,255,255,.06)', drawTicks: false }, border: { display: false }, ticks: { maxTicksLimit: 10, maxRotation: 0, padding: 8, font: { size: 12 } } },
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,.06)', drawTicks: false }, border: { display: false }, ticks: { padding: 8, font: { size: 12 }, callback: v => fmtInt(v) } }
+          x: { grid: { color: '#ecedeb', drawTicks: false }, border: { display: false }, ticks: { maxTicksLimit: 10, maxRotation: 0, padding: 8, font: { size: 12 } } },
+          y: { beginAtZero: true, grid: { color: '#ecedeb', drawTicks: false }, border: { display: false }, ticks: { padding: 8, font: { size: 12 }, callback: v => fmtInt(v) } }
         }
       }
     });
@@ -1032,7 +945,7 @@ $('legenda').addEventListener('click', e => {
 
 /* ========================= avisos (toast) ========================= */
 let assinaturaAnterior = null;
-const assinatura = r => [r.chave, r.imovel, r.tipoTxt, r.valor, +r.data].join('|');
+const assinatura = r => [r.chave, r.imovel, r.valor, +r.data].join('|');
 function avisarNovidades(dados) {
   const atuais = dados.registros.map(assinatura);
   let qtdNovos = 0;
@@ -1046,7 +959,7 @@ function avisarNovidades(dados) {
       if (!c) return;
       const el = document.createElement('div');
       el.className = 'toast';
-      el.innerHTML = `${avatar(c)}<div><b>Nova captação!</b><br>${esc(r.corretor)} · ${fmtBRLc(r.valor)} · <b>${r.pontos >= 0 ? '+' : '−'}${fmtPts(Math.abs(r.pontos))} pts</b><br><span style="color:var(--texto-2);font-size:13px">agora em ${c.pos}º lugar</span></div>`;
+      el.innerHTML = `${avatar(c)}<div><b>Nova captação!</b><br>${esc(r.corretor)} · ${fmtBRLc(r.valor)} · <b>+${fmtPts(r.pontos)} pts</b><br><span style="color:var(--text-2);font-size:13px">agora em ${c.pos}º lugar</span></div>`;
       $('toasts').appendChild(el);
       setTimeout(() => el.remove(), 9000);
     });
@@ -1077,7 +990,7 @@ function toastSimples(html, ms = 3500) {
   setTimeout(() => el.remove(), ms);
 }
 function rodape(nome, salvoEm) {
-  const E = estado, partes = [`Fonte: ${esc(nome)}`];
+  const E = estado, partes = [`<b>${esc(E.camp.nome || 'Campanha de Captação')}</b>`, `Fonte: ${esc(nome)}`];
   if (salvoEm) partes.push(`planilha salva em ${salvoEm.toLocaleString('pt-BR')}`);
   if (E.fora) partes.push(`${E.fora} captação(ões) fora do período ignorada(s)`);
   if (E.incompletas) partes.push(`${E.incompletas} linha(s) incompleta(s) ignorada(s)`);
@@ -1116,13 +1029,13 @@ async function atualizar(manual) {
     const novos = avisarNovidades(dados);
     ultimaLeitura = new Date();
     rodape(nome, salvo ? new Date(salvo) : null);
-    setStatus('ok', `${ultimaLeitura.toLocaleDateString('pt-BR')} ${hora(ultimaLeitura)}`);
+    setStatus('ok', `Atualizado às <b>${hora(ultimaLeitura)}</b>`);
     if (manual && !novos) toastSimples('<b>✓ Dados atualizados</b> com a versão mais recente da planilha.');
   } catch (e) {
     console.error(e);
     if (estado) {
       setStatus('err', 'Falha ao atualizar');
-      toastSimples(`<b>Não foi possível ler a planilha.</b><br><span style="color:var(--texto-2)">${esc(e.message)}</span><br><span style="color:var(--muted);font-size:13px">Continuam exibidos os dados das ${hora(ultimaLeitura)}. Tente de novo em instantes.</span>`, 9000);
+      toastSimples(`<b>Não foi possível ler a planilha.</b><br><span style="color:var(--text-2)">${esc(e.message)}</span><br><span style="color:var(--muted);font-size:13px">Continuam exibidos os dados das ${hora(ultimaLeitura)}. Tente de novo em instantes.</span>`, 9000);
     } else {
       mostrarAviso('Não foi possível carregar a planilha', esc(e.message), { passos: !!e.semServidor, tentar: true });
     }
